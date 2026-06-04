@@ -1,0 +1,38 @@
+# ==========================================
+# Operating System Junk
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==========================================
+# IDEs and Text Editors
+# ==========================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains (Rider, WebStorm, etc.)
+.idea/
+.idea/**
+*.ids
+*.ipr
+*.iws
+
+# Visual Studio global artifacts
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# ==========================================
+# Global Logs & Diagnostic Files
+# ==========================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+!/.idea/

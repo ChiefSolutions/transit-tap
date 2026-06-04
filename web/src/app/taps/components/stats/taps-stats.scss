@@ -1,0 +1,33 @@
+@use "styles/mixins/shared.mixins";
+@use "styles/mixins/media-queries";
+
+:host {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+  width: 100%;
+
+  @include media-queries.tablet-ms {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 760px;
+  }
+}
+
+.TapsStats {
+
+  &-stat {
+    box-sizing: border-box;
+    background-color: var(--colour-background-secondary);
+    border: var(--border-size-default) solid var(--colour-cool-grey);
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-default);
+  }
+
+  &-value {
+    color: var(--colour-charcoal-black);
+    font-weight: bold;
+    font-size: var(--font-size-medium);
+  }
+}

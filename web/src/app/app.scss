@@ -1,0 +1,13 @@
+@use "styles/mixins/media-queries";
+
+:host{
+  display: block;
+  max-width: 1600px;
+  height: 100%;
+  overflow: hidden;
+
+  @include media-queries.device-xls {
+    width: 1600px;
+    margin: 0 auto;
+  }
+}

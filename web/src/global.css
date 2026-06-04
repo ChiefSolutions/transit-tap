@@ -1,0 +1,43 @@
+:root {
+  /**FONT SIZES**/
+  --font-size-xxsmall: 0.625rem; /** 10px **/
+  --font-size-xsmall: 0.75rem; /** 12px **/
+  --font-size-small: 0.875rem; /** 14px **/
+  --font-size-default: 1rem; /** 16px **/
+  --font-size-medium: 1.25rem; /** 20px **/
+  --font-size-large: 1.5rem; /** 24px **/
+  --font-size-xlarge: 2rem; /** 32px **/
+
+  /**FONT WEIGHTS**/
+  --font-weight-bold: 600;
+
+  /**SPACING**/
+  --spacing-xxsmall: 0.5rem; /** 10px **/
+  --spacing-xsmall: 0.625rem; /** 10px **/
+  --spacing-small: 0.875rem; /** 14px **/
+  --spacing-default: 1rem; /** 16px **/
+
+  /**BORDER SIZES**/
+  --border-size-default: 0.063rem; /** 1px **/
+  --border-radius-xxsmall: 0.5rem; /** 8px **/
+  --border-radius-xxxl: 1.25rem; /** 20px **/
+
+  /**COLOURS**/
+  --colour-background-secondary: #F5F4ED;
+  --colour-white: #FFFFFF;
+  --colour-blush-white: #FEF2F2;
+  --colour-powder-blue: #E6F1FB;
+  --colour-steel-blue: #185FA5;
+  --colour-pale-mint: #E1F5EE;
+  --colour-emerald-green: #24A850;
+  --colour-cardinal-red: #DC2626;
+  --colour-charcoal-black: #333333;
+  --colour-ash-black: #777777;
+  --colour-slate-white: #f8fafc;
+  --colour-cool-grey: #e2e8f0;
+  --colour-soft-indigo: #E0E7FF;
+  --colour-deep-indigo: #3730A3;
+  --colour-soft-amber: #FEF3C7;
+  --colour-deep-amber: #92400E;
+  --colour-bone: #EAE9E2;
+}

@@ -1,0 +1,12 @@
+# Build outputs
+bin/
+obj/
+
+# Local user configurations & secrets
+appsettings.Development.json
+appsettings.local.json
+*.user
+*.suo
+
+# Crash dumps & logging
+*.log

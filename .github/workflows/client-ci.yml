@@ -1,0 +1,66 @@
+name: Client CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'web/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'web/**'
+  workflow_dispatch:
+
+jobs:
+  build-client:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: './web/package-lock.json'
+
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules
+          npm install --no-save --no-audit --no-fund
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run Unit Tests
+        run: npm run test -- --watch=false
+
+      # 👈 NEW: Caches the massive Playwright browser binaries
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('web/package-lock.json') }}
+
+      - name: Install Playwright Chromium Browser
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Playwright E2E Tests
+        run: npm run e2e
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: playwright-report
+          path: web/playwright-report/
+          retention-days: 7
+
+      - name: Build Angular
+        run: npm run build -- --configuration=production

@@ -1,0 +1,16 @@
+<td><span data-testid="taps-row-device-name">{{data().deviceName}}</span></td>
+<td><span data-testid="taps-row-device-timestamp">{{data().timestamp | date:'mediumTime':'UTC'}}</span></td>
+<td><span data-testid="taps-row-event"
+          class="TapsRow-pill"
+          [class]="{
+        'TapsRow--in': data().event === 'TapIn',
+        'TapsRow--out': data().event === 'TapOut'
+      }">{{ TapEventLabelMap[data().event] }}</span></td>
+<td>
+  <span data-testid="taps-row-status"
+        class="TapsRow-pill"
+        [class]="{
+        'TapsRow--success': data().status === 'Success',
+        'TapsRow--declined': data().status === 'Declined'
+      }">{{data().status}}</span>
+</td>
