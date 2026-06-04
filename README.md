@@ -1,7 +1,11 @@
-# 🚍 🚋 TransitTap
+# 🚍 🚋 Transit Tap
 
 TransitTap is a full-stack showcase monorepo simulating real-time public transport network data. The application mimics
 a high-throughput stream of passenger card "taps" across various urban transit networks, including buses and trams.
+
+# 💻 Quick Demo
+
+https://github.com/user-attachments/assets/94b0e976-cee3-4ec2-9e8e-2a72a936be08
 
 ## 📁 Repository Structure
 
