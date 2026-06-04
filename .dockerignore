@@ -1,0 +1,25 @@
+# Ignore local build artifacts
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+
+# Ignore frontend test/dev suites during Docker COPY
+**/.angular/
+**/.vscode/
+**/__mocks__/
+**/coverage/
+**/e2e/
+**/node_modules
+**/playwright-report
+**/test-results
+**/.editorconfig
+**/.gitignore
+**/.prettierrc
+**/playwright.config.ts
+**/README.md
+
+
+**/.idea/
+.github
+.idea

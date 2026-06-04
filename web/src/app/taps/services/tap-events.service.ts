@@ -36,11 +36,20 @@ export class TapEventsService {
       };
 
       eventSource.addEventListener('close', () => {
+        console.log('Closing stream...');
         eventSource.close();
         observer.complete();
+        console.log('Stream closed and disconnected.');
       });
 
       eventSource.onerror = (error) => {
+        if (eventSource.readyState === EventSource.CONNECTING) {
+          // Auto-retry in progress, shut it down
+          eventSource.close();
+          observer.complete();
+          return;
+        }
+
         // Suppress errors if the client or server already closed the connection cleanly
         if (eventSource.readyState !== EventSource.CLOSED) {
           console.log('An error occurred, closing stream connection...');
