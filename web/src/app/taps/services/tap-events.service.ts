@@ -45,8 +45,9 @@ export class TapEventsService {
       eventSource.onerror = (error) => {
         if (eventSource.readyState === EventSource.CONNECTING) {
           // Auto-retry in progress, shut it down
-          eventSource.close();
+          observer.error(error);
           observer.complete();
+          eventSource.close();
           return;
         }
 

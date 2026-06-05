@@ -7,8 +7,8 @@
     "outDir": "./out-tsc/spec",
     "types": ["vitest/globals", "node"],
     "paths": {
-      "__mock__/*": ["__mocks__/*"]
+      "tests/*": ["tests/*"]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.spec.ts", "__mocks__/**/*.ts"]
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
 }

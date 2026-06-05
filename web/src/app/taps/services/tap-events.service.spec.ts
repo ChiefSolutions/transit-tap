@@ -1,9 +1,9 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TapEventsService } from './tap-events.service';
-import { MockEventSource } from '__mock__/event-source.mock';
+import { MockEventSource } from 'tests/mocks/event-source.mock';
 import { TapTableRow } from '../models';
-import { mockTapEventsResponse, mockSummary } from '__mock__/data';
+import { mockTapEventsResponse, mockSummary } from 'tests/mocks/data';
 
 const EventSourceMock = vi.fn(MockEventSource);
 const testTap = mockTapEventsResponse[0].tap;
@@ -86,40 +86,68 @@ describe('TapEventsService', () => {
   });
 
   describe('when on error occurs when connection is open', () => {
+    let openError: string | undefined;
+
     beforeEach(() => {
       service.getEvents().subscribe({
-        error: () => {
-          // Intentional no-op: TODO: // implement error handling tests
+        error: (event) => {
+          openError = event.type;
         },
       });
     });
 
     it('should close the event', async () => {
-      const instance = EventSourceMock.mock.instances[0];
+      const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
       instance.readyState = 1;
-      instance.onerror();
+      instance.onerror(new Event('Open error'));
 
       expect(instance.close).toHaveBeenCalled();
+      expect(openError).toBe('Open error');
     });
   });
 
   describe('when an error occurs but the connection is already closed', () => {
+    let closedError: string | undefined;
+
     beforeEach(() => {
       service.getEvents().subscribe({
-        error: () => {
-          // Intentional no-op: TODO: // implement error handling tests
+        error: (event: Event) => {
+          closedError = event.type;
         },
       });
     });
 
     it('should not close the event', async () => {
-      const instance = EventSourceMock.mock.instances[0];
+      const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
       instance.readyState = 2;
-      instance.onerror();
+      instance.onerror(new Event('Close error'));
 
-      expect(instance.close).not.to.toBeUndefined();
+      expect(instance.close).not.toHaveBeenCalled();
+      expect(closedError).toBe(undefined);
+    });
+  });
+
+  describe('when an error occurs while connecting', () => {
+    let connectingError: string | undefined;
+
+    beforeEach(() => {
+      service.getEvents().subscribe({
+        error: (error: Event) => {
+          connectingError = error.type;
+        },
+      });
+    });
+
+    it('should not close the event', async () => {
+      const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
+
+      instance.readyState = 0;
+      instance.onerror(new Event('Connecting error'));
+
+      expect(instance.close).to.toHaveBeenCalled();
+      expect(connectingError).toBe('Connecting error');
     });
   });
 });

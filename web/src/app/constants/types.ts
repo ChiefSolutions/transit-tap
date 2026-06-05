@@ -6,3 +6,8 @@ export interface TapEventLabelMapper {
   SystemError: string;
   [key: string]: string;
 }
+
+export interface TapsListTableColumnsNames {
+  name: string;
+  text: string;
+}

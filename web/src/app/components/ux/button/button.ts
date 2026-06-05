@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-button',
@@ -6,4 +6,9 @@ import { Component } from '@angular/core';
   templateUrl: './button.html',
   styleUrl: './button.scss',
 })
-export class Button {}
+export class Button {
+  @Input() public text = 'Button';
+  @Input() public onClick: () => void = () => {
+    /* Default no-op handler */
+  };
+}

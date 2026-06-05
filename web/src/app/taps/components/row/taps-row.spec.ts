@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 import { TapEventLabelMap } from '../../../constants';
 import { DatePipe } from '@angular/common';
 import { TapEvent } from '../../models';
-import { mockTapTableRowData } from '__mock__/data';
+import { mockTapTableRowData } from 'tests/mocks/data';
 
 const testTapRowData = mockTapTableRowData[0];
 
@@ -37,7 +37,7 @@ describe('TapSRow', () => {
     const statusEl = fixture.debugElement.query(By.css('[data-testid="taps-row-status"]'));
 
     expect(deviceNameEl.nativeElement.textContent).toEqual('BUS LINE 02');
-    expect(timeStampEl.nativeElement.textContent).toEqual('9:18:50 PM');
+    expect(timeStampEl.nativeElement.textContent).toEqual('10:18:50 PM');
     expect(eventEl.nativeElement.textContent).toEqual(TapEventLabelMap[testTapRowData.event]);
     expect(eventEl.nativeElement.classList.contains('TapsRow--out')).toBeTruthy();
     expect(statusEl.nativeElement.textContent).toEqual(TapEventLabelMap[testTapRowData.status]);

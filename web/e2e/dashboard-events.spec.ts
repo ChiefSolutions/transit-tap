@@ -2,13 +2,13 @@ import { expect, test } from '@playwright/test';
 
 import { MyCustomOptions } from '../playwright.config';
 import { getStatsValueLocators, mockServerSideEvents } from './utils';
-import { mockTapEventsResponse } from '../__mocks__/data';
+import { mockTapEventsResponse } from '../tests/mocks/data';
 import * as path from 'node:path';
 
 test.describe('Dashboard Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript({
-      path: path.join(__dirname, '../__mocks__/e2e/event-source.mock.js'),
+      path: path.join(__dirname, '../tests/mocks/e2e/event-source.mock.js'),
     });
   });
 
@@ -22,14 +22,14 @@ test.describe('Dashboard Tests', () => {
     });
 
     test('has heading', async ({ page }) => {
-      const heading = page.locator('h1.TapsList-heading');
+      const heading = page.locator('h1.TapsListHeader-heading');
 
       await expect(heading).toBeVisible();
       await expect(heading).toHaveText('Transit Tap Event Stream');
     });
 
     test('has connection indicator when no sse connection', async ({ page }) => {
-      const indicatorLabel = page.locator('span.TapsList-liveIndicatorLabel');
+      const indicatorLabel = page.locator('span.TapsListHeader-liveIndicatorLabel');
 
       await expect(indicatorLabel).toBeVisible();
       await expect(indicatorLabel).toHaveText('Not connected');
@@ -65,7 +65,7 @@ test.describe('Dashboard Tests', () => {
       await mockServerSideEvents(`${apiURL}/taps`, page, mockTapEventsResponse);
       await page.goto('/');
 
-      const indicatorLabel = page.locator('span.TapsList-liveIndicatorLabel');
+      const indicatorLabel = page.locator('span.TapsListHeader-liveIndicatorLabel');
       const { totalEventsValue, totalTapInsValue, totalTapOutsValue, declinedValue } =
         getStatsValueLocators(page);
 

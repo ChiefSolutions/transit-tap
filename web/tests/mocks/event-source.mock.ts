@@ -2,16 +2,16 @@ import { vi } from 'vitest';
 
 export class MockEventSource {
   url: string;
-  static CONNECTING: number = 0;
-  static OPEN: number = 1;
-  static CLOSED: number = 2;
+  static CONNECTING = 0;
+  static OPEN = 1;
+  static CLOSED = 2;
 
   onopen: () => void;
-  onerror: () => void;
+  onerror: (errorEvent: Event) => void;
   onmessage: (event: { data: string }) => void;
   dispatchCustomEvent: (type: string) => void;
   addEventListener: (type: string, listener: () => void) => void;
-  readyState: number = 0;
+  readyState = 0;
 
   private listeners: Record<string, () => void> = {};
 
