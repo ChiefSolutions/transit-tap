@@ -1,0 +1,68 @@
+@use "styles/mixins/shared.mixins";
+
+.TapsListHeader {
+  &-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xxsmall);
+    margin-bottom: var(--spacing-default);
+  }
+
+  &-heading {
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-bold);
+    color: var(--colour-charcoal-black);
+  }
+
+  &-liveIndicator {
+    background-color: var(--colour-background-secondary);
+    border: var(--border-size-default) solid var(--colour-cool-grey);
+    border-radius: var(--border-radius-xxxl);
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    gap: var(--spacing-xxsmall);
+    margin-left: var(--spacing-xxsmall);
+    padding: var(--spacing-xsmall) var(--spacing-small);
+    font-size: var(--font-size-small);
+    letter-spacing: 0.05em;
+    width: max-content;
+    position: relative;
+
+    &::before {
+      z-index: 2;
+    }
+
+    &::after {
+      z-index: 1;
+      animation: pill-ripple 2s cubic-bezier(0.25, 0, 0, 1) infinite;
+    }
+  }
+
+  &-liveIndicatorLabel {
+    display: inline-flex;
+    margin-left: var(--spacing-default);
+  }
+
+  &--live {
+    &::before {
+      @include shared.pulse-dot(var(--colour-emerald-green));
+    }
+
+    &::after {
+      @include shared.pulse-dot(var(--colour-emerald-green));
+    }
+  }
+
+  &--disconnected {
+    &::before {
+      @include shared.pulse-dot(var(--colour-cardinal-red));
+    }
+
+    &::after {
+      @include shared.pulse-dot(var(--colour-cardinal-red));
+    }
+  }
+}

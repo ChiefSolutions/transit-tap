@@ -45,3 +45,10 @@ export interface TapStat {
   label: string;
   value: number;
 }
+
+export type SortDirection = 'none' | 'asc' | 'desc';
+
+export interface TableSort {
+  direction: SortDirection;
+  column: keyof TapTableRow;
+}

@@ -1,15 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TapsList } from './taps-list';
-import { TapsStats } from './components/stats/taps-stats';
-import { initialState, selectRows, selectIsLoading, selectIsConnected } from './+state/tap.reducer';
+import { TapsStats } from './components';
+import {
+  initialState,
+  selectRows,
+  selectIsLoading,
+  selectIsConnected,
+  selectStats,
+} from './+state/tap.reducer';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
-import { mockTapTableRowData } from '__mock__/data';
+import { mockTapTableRowData } from 'tests/mocks/data';
+import { getDefaultTapEventsSummary } from './utils';
+import { EventEmitter } from '@angular/core';
+import { getTapsListTestChildren } from 'tests/utils';
+import { TableSort } from './models';
+import { TapActions } from './+state/tap.actions';
 
-const findChildElement = (text: string) => {
-  return (de: DebugElement) => de.nativeElement.textContent.trim() === text;
-};
+const mockTap = mockTapTableRowData[0];
 describe('TapsList', () => {
   let component: TapsList;
   let mockStore: MockStore;
@@ -17,10 +24,7 @@ describe('TapsList', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [
-        provideMockStore({ initialState }),
-        // other providers
-      ],
+      providers: [provideMockStore({ initialState })],
       imports: [TapsStats],
     }).compileComponents();
 
@@ -35,94 +39,95 @@ describe('TapsList', () => {
   });
 
   describe('when there is no connection', () => {
-    it('Should stream and render the data', () => {
-      const headerEl = fixture.debugElement.query(By.css('.TapsList-header'));
-      const busIconEl = fixture.debugElement.query(By.css('[data-testid="bus-icon"]'));
-      const headingEl = fixture.debugElement.query(By.css('.TapsList-heading'));
-      const connectionStatusContainerEl = fixture.debugElement.query(
-        By.css('.TapsList-liveIndicator'),
-      );
-      const connectionStatusLabelEl = fixture.debugElement.query(
-        By.css('.TapsList-liveIndicatorLabel'),
-      );
-      const appStatsComponent = fixture.debugElement.query(
-        By.css('[data-testid="app-taps-stats"]'),
-      );
-      const tableComponent = fixture.debugElement.query(By.css('.TapsList-table'));
-      const columnEls = fixture.debugElement.queryAll(By.css('[data-testid="table-header-colum"]'));
-      const deviceNameEl = columnEls.find(findChildElement('Device Name'));
-      const timestampEl = columnEls.find(findChildElement('Timestamp'));
-      const eventEl = columnEls.find(findChildElement('Event'));
-      const statusEl = columnEls.find(findChildElement('Status'));
-      const noDataLabelEl = fixture.debugElement.query(By.css('.TapsList-noDataLabel'));
-
-      expect(headerEl).toBeTruthy();
-      expect(busIconEl).toBeTruthy();
-      expect(headingEl).toBeTruthy();
-      expect(headingEl.nativeElement.textContent).toBe('Transit Tap Event Stream');
-      expect(
-        connectionStatusContainerEl.nativeElement.classList.contains('TapsList--disconnected'),
-      ).toBe(true);
-      expect(connectionStatusLabelEl.nativeElement.textContent).toBe('Not connected');
-      expect(appStatsComponent.nativeElement).toBeTruthy();
-      expect(tableComponent.nativeElement).toBeTruthy();
-      expect(columnEls.length).toEqual(4);
-      expect(deviceNameEl?.nativeElement).toBeTruthy();
-      expect(timestampEl?.nativeElement).toBeTruthy();
-      expect(eventEl?.nativeElement).toBeTruthy();
-      expect(statusEl?.nativeElement).toBeTruthy();
-      expect(noDataLabelEl.nativeElement.textContent).toBe('No data to display at the moment.');
-    });
-  });
-
-  describe('when there a connection but data is fetching', () => {
     beforeEach(() => {
       mockStore.overrideSelector(selectRows, []);
-      mockStore.overrideSelector(selectIsLoading, true);
+      mockStore.overrideSelector(selectStats, getDefaultTapEventsSummary());
+      mockStore.overrideSelector(selectIsLoading, false);
       mockStore.overrideSelector(selectIsConnected, false);
       mockStore.refreshState();
       fixture.detectChanges();
     });
 
-    it('Should show the loading state', async () => {
-      const loaderEl = fixture.debugElement.query(By.css('.TapsList-loader'));
-      const noDataLabelEl = fixture.debugElement.query(By.css('.TapsList-noDataLabel'));
+    it('Should set the data states on the child components', async () => {
+      const {
+        headerDebugEl,
+        statsDebugEl,
+        tableDebugEl,
+        headerInstance,
+        statsInstance,
+        tableInstance,
+      } = getTapsListTestChildren(fixture);
 
-      expect(loaderEl).toBeTruthy();
-      expect(noDataLabelEl.nativeElement.textContent).toBe('No data to display at the moment.');
+      expect(headerDebugEl).toBeTruthy();
+      expect(statsDebugEl).toBeTruthy();
+      expect(tableDebugEl).toBeTruthy();
+      expect(headerInstance.connected).toBe(false);
+      expect(statsInstance.summary()).toEqual(getDefaultTapEventsSummary());
+      expect(tableInstance.data).toEqual([]);
+      expect(tableInstance.isLoading).toEqual(false);
+      expect(tableInstance.sortColumn instanceof EventEmitter).toBe(true);
     });
   });
 
-  describe('when there a connection with data stream', () => {
+  describe('when there is a connection but data is fetching', () => {
     beforeEach(() => {
-      mockStore.overrideSelector(selectRows, mockTapTableRowData);
+      mockStore.overrideSelector(selectRows, []);
+      mockStore.overrideSelector(selectIsLoading, true);
+      mockStore.overrideSelector(selectIsConnected, true);
+      mockStore.refreshState();
+      fixture.detectChanges();
+    });
+
+    it('should set the data states on the child components', async () => {
+      const { headerInstance, tableInstance } = getTapsListTestChildren(fixture);
+
+      expect(headerInstance.connected).toBe(true);
+      expect(tableInstance.isLoading).toEqual(true);
+    });
+  });
+
+  describe('when data is fetched', () => {
+    beforeEach(() => {
+      mockStore.overrideSelector(selectRows, [mockTap]);
+      mockStore.overrideSelector(selectStats, {
+        total: 1,
+        tapIns: 0,
+        tapOuts: 1,
+        declined: 0,
+        errors: 0,
+      });
       mockStore.overrideSelector(selectIsLoading, false);
       mockStore.overrideSelector(selectIsConnected, true);
       mockStore.refreshState();
       fixture.detectChanges();
     });
 
-    it('Should render the list', async () => {
-      const loaderEl = fixture.debugElement.query(By.css('.TapsList-loader'));
-      const loaderElAfterUpdate = fixture.debugElement.query(By.css('.TapsList-loader'));
-      const connectionStatusContainerEl = fixture.debugElement.query(
-        By.css('.TapsList-liveIndicator'),
-      );
-      const connectionStatusLabelEl = fixture.debugElement.query(
-        By.css('.TapsList-liveIndicatorLabel'),
-      );
-      const noDataLabelEl = fixture.debugElement.query(By.css('.TapsList-noDataLabel'));
-      const rowDataEls = fixture.debugElement.queryAll(By.css('[data-testid="row-data"]'));
+    it('should set the data states on the child components', async () => {
+      const { headerInstance, statsInstance, tableInstance } = getTapsListTestChildren(fixture);
 
-      expect(loaderEl).toBeFalsy();
+      expect(headerInstance.connected).toBe(true);
+      expect(statsInstance.summary()).not.toEqual(getDefaultTapEventsSummary());
+      expect(tableInstance.isLoading).toEqual(false);
+      expect(tableInstance.data).toEqual([mockTap]);
+    });
+  });
 
-      expect(loaderElAfterUpdate).toBeFalsy();
-      expect(noDataLabelEl).toBeFalsy();
-      expect(connectionStatusLabelEl.nativeElement.textContent).toBe('Live stream');
-      expect(connectionStatusContainerEl.nativeElement.classList.contains('TapsList--live')).toBe(
-        true,
-      );
-      expect(rowDataEls.length).toEqual(mockTapTableRowData.length);
+  describe('when sorting is emitted', () => {
+    const value: TableSort = { column: 'deviceName', direction: 'asc' };
+
+    beforeEach(() => {
+      vi.spyOn(component, 'onSortChange');
+      vi.spyOn(mockStore, 'dispatch');
+
+      const { tableInstance } = getTapsListTestChildren(fixture);
+
+      tableInstance.sortColumn.emit(value);
+      fixture.detectChanges();
+    });
+
+    it('should dispatch sorting to the store', () => {
+      expect(component.onSortChange).toHaveBeenCalledWith(value);
+      expect(mockStore.dispatch).toHaveBeenCalledWith(TapActions.sort(value));
     });
   });
 });

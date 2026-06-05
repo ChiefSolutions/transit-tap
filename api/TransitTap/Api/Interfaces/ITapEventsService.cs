@@ -4,5 +4,5 @@ namespace Api.Interfaces;
 
 public interface ITapEventsService
 {
-    IAsyncEnumerable<TapStreamPayload> GetTapEvents(CancellationToken cancellationToken);
+    IAsyncEnumerable<TapStreamPayload> GetTapEvents(bool isProd, CancellationToken cancellationToken);
 }

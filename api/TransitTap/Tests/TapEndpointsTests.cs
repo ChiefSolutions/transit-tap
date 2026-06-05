@@ -1,4 +1,3 @@
-using System.Net.Http;
 using System.Text.Json;
 using Api.Enums;
 using Api.Interfaces;
@@ -51,7 +50,7 @@ public class TapEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         };
 
         // Update to match the new service method signature
-        _mockTapService.GetTapEvents(Arg.Any<CancellationToken>())
+        _mockTapService.GetTapEvents(false,Arg.Any<CancellationToken>())
             .Returns(expectedPayloads.ToAsyncEnumerable());
 
         var client = _factory.CreateClient();

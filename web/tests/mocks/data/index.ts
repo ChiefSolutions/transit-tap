@@ -1,4 +1,4 @@
-import { TapTableRow, Tap, TapEventsSummary, TapResponse } from '../../src/app/taps/models';
+import { TapTableRow, TapEventsSummary, TapResponse } from '../../../src/app/taps/models';
 
 export const mockTapEventsResponse: TapResponse[] = [
   {
@@ -35,7 +35,7 @@ export const mockTapEventsResponse: TapResponse[] = [
     tap: {
       eventId: '5e227aba-8403-43c4-b9b3-40f756bcea59',
       deviceId: 'fee64746-180b-4536-aadf-2629e11ece9a',
-      deviceName: 'BUS LINE 02',
+      deviceName: 'BUS LINE 01',
       timestamp: '2026-06-03T21:18:53.032196Z',
       cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
       event: 'TapOut',

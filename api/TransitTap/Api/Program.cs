@@ -1,40 +1,45 @@
 using System.Text.Json;
+using System.Threading.RateLimiting;
+using Api.Configurations;
 using Api.EndPoints;
+using Api.Extensions;
 using Api.Interfaces;
 using Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+var policies = builder.Configuration.GetSection(PolicyOptions.SectionName).Get<PolicyOptions>()
+               ?? throw new InvalidOperationException($"{PolicyOptions.SectionName} config is missing.");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<ITapEventsService, TapEventsService>();
-builder.Services.AddSingleton(new JsonSerializerOptions
-{
-    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-});
+builder.Services.AddSingleton(new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+builder.Services.AddCustomCors(policies.Cors, allowedOrigins);
 
-builder.Services.AddCors(options =>
+if (builder.Environment.IsProduction())
 {
-    options.AddPolicy("Cors", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:4200")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+    builder.Services.AddCustomRateLimiter(policies.Streaming);
+}
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseHttpsRedirection();
+app.UseCors(policies.Cors); // Fixed hardcoded string bug
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseCors("Cors");
+}
+else if (app.Environment.IsProduction())
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+    app.UseRateLimiter();
+    app.MapFallbackToFile("index.html");
 }
 
-app.UseHttpsRedirection();
+app.RegisterTapEndPoints(app.Environment.IsProduction());
 
-app.RegisterTapEndPoints();
 app.Run();

@@ -11,7 +11,6 @@ import { TapEventLabelMap } from '../../../constants';
   styleUrl: './taps-row.scss',
 })
 export class TapsRow {
-  // Required read-only signal input from the parent container
   public readonly data = input.required<TapTableRow>();
   protected readonly TapEventLabelMap = TapEventLabelMap;
 }

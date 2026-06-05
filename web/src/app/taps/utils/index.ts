@@ -1,3 +1,5 @@
+import { TapTableRow } from '../models';
+
 export const getDefaultTapEventsSummary = () => ({
   total: 0,
   tapIns: 0,
@@ -5,3 +7,20 @@ export const getDefaultTapEventsSummary = () => ({
   declined: 0,
   errors: 0,
 });
+
+export function sortRows(
+  rows: TapTableRow[],
+  column: keyof TapTableRow,
+  direction: 'asc' | 'desc' | 'none',
+): TapTableRow[] {
+  const isAsc = direction === 'asc';
+
+  return rows.sort((a, b) => {
+    if (a[column] === b[column]) {
+      return 0;
+    }
+
+    const cmp = a[column] > b[column] ? 1 : -1;
+    return isAsc ? cmp : -cmp;
+  });
+}

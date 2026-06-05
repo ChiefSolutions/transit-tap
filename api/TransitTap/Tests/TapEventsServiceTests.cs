@@ -20,7 +20,7 @@ public class TapEventsServiceTests
 
         try
         {
-            await foreach (var payload in service.GetTapEvents(cts.Token))
+            await foreach (var payload in service.GetTapEvents(false, cts.Token))
             {
                 generatedPayloads.Add(payload);
                 
@@ -71,7 +71,7 @@ public class TapEventsServiceTests
         var generatedPayloads = new List<TapStreamPayload>();
 
         // Act
-        await foreach (var payload in service.GetTapEvents(cts.Token))
+        await foreach (var payload in service.GetTapEvents(false, cts.Token))
         {
             generatedPayloads.Add(payload);
         }
@@ -91,7 +91,7 @@ public class TapEventsServiceTests
         // Act
         try
         {
-            await foreach (var payload in service.GetTapEvents(cts.Token))
+            await foreach (var payload in service.GetTapEvents(false, cts.Token))
             {
                 generatedPayloads.Add(payload);
 

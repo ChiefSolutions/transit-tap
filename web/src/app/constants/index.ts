@@ -1,4 +1,4 @@
-import { TapEventLabelMapper } from './types';
+import { TapEventLabelMapper, TapsListTableColumnsNames } from './types';
 
 export const TapEventLabelMap: TapEventLabelMapper = {
   TapIn: 'Tap In',
@@ -7,3 +7,22 @@ export const TapEventLabelMap: TapEventLabelMapper = {
   DeniedInsufficientFunds: 'Declined',
   SystemError: 'System Error',
 };
+
+export const TapsListTableColumns: TapsListTableColumnsNames[] = [
+  {
+    name: 'deviceName',
+    text: 'Device Name',
+  },
+  {
+    name: 'timestamp',
+    text: 'Timestamp',
+  },
+  {
+    name: 'event',
+    text: 'Event',
+  },
+  {
+    name: 'status',
+    text: 'Status',
+  },
+];

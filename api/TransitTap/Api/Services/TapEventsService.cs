@@ -28,20 +28,30 @@ public class TapEventsService() : ITapEventsService
     ];
 
     public async IAsyncEnumerable<TapStreamPayload> GetTapEvents(
+        bool isProd,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var cardStates = new Dictionary<string, TapEvent>();
+        // TODO - SignalR to properly tie down time limits
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(15));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, isProd ? timeoutCts.Token : CancellationToken.None);
+
         const string mockCardToken = "tkn_27rSqew9gZSjJ45xSi1yqKfa";
+        const int minDelay = 500;
+        
+        var cardStates = new Dictionary<string, TapEvent>();
+        var maxStream = isProd ? 100 : 10_000;
+        var maxDelay = isProd ? 5000 : 2000;
+        var totalEvents = 0;
+        var tapIns = 0;
+        var tapOuts = 0;
+        var declined = 0;
+        var errors = 0;
+        var counter = 1;
+        
 
-        int totalEvents = 0;
-        int tapIns = 0;
-        int tapOuts = 0;
-        int declined = 0;
-        int errors = 0;
-
-        while (!cancellationToken.IsCancellationRequested)
+        while (!linkedCts.Token.IsCancellationRequested && counter <= maxStream)
         {
-            await Task.Delay(Random.Shared.Next(500, 2000), cancellationToken);
+            await Task.Delay(Random.Shared.Next(minDelay, maxDelay), cancellationToken);
 
             var device = Devices[Random.Shared.Next(Devices.Length)];
             var status = Statuses[Random.Shared.Next(Statuses.Length)];
@@ -71,6 +81,8 @@ public class TapEventsService() : ITapEventsService
                 Event = nextEvent,
                 Status = status
             };
+            
+            counter++;
 
             // Yield using your updated record signature
             yield return new TapStreamPayload(
