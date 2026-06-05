@@ -5,11 +5,16 @@ on:
     branches: [ main ]
     paths:
       - 'web/**'
+      - '.github/workflows/client-ci.yml'
   pull_request:
-    branches: [ main ]
+    branches: [ develop, 'feature/**' ]
     paths:
       - 'web/**'
+      - '.github/workflows/client-ci.yml'
   workflow_dispatch:
+
+env:
+  TZ: 'Europe/London'
 
 jobs:
   build-client:
