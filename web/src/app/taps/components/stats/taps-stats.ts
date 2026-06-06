@@ -1,5 +1,5 @@
 import { Component, input, computed } from '@angular/core';
-import { TapStat, TapEventsSummary } from '../../models';
+import { TapStat, TapEventsSummary } from '../../types';
 import { getDefaultTapEventsSummary } from '../../utils';
 
 @Component({

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TapTableRow, TapResponse, TapRowWithStats } from '../models';
-import { TapEventLabelMap } from '../../constants';
+import { TapTableRow, TapResponse, TapRowWithStats } from '../types';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -20,17 +19,11 @@ export class TapEventsService {
         console.log('Successfully connected to the stream!');
       };
 
-      eventSource.onmessage = (event: MessageEvent<string>) => {
-        const data: TapResponse = JSON.parse(event.data);
+      eventSource.onmessage = (message: MessageEvent<string>) => {
+        const data: TapResponse = JSON.parse(message.data);
         const { tap, summary } = data;
-
-        const row: TapTableRow = {
-          eventId: tap.eventId,
-          deviceName: tap.deviceName,
-          timestamp: tap.timestamp,
-          event: tap.event,
-          status: TapEventLabelMap[tap.status],
-        };
+        const { deviceName, event, eventId, status, timestamp } = tap;
+        const row: TapTableRow = { deviceName, event, eventId, status, timestamp };
 
         observer.next({ tap: row, summary });
       };

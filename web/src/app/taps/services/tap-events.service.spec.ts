@@ -2,8 +2,8 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TapEventsService } from './tap-events.service';
 import { MockEventSource } from 'tests/mocks/event-source.mock';
-import { TapTableRow } from '../models';
-import { mockTapEventsResponse, mockSummary } from 'tests/mocks/data';
+import { TapTableRow } from '../types';
+import { mockTapEventsResponse, mockSummary, mockTapTableRowData } from 'tests/mocks/data';
 
 const EventSourceMock = vi.fn(MockEventSource);
 const testTap = mockTapEventsResponse[0].tap;
@@ -45,6 +45,7 @@ describe('TapEventsService', () => {
 
     it('should transform and emit incoming stream events', () => {
       const instance = EventSourceMock.mock.instances[0];
+      const testRowTap = mockTapTableRowData[0];
 
       instance.onopen();
       instance.onmessage({
@@ -54,12 +55,14 @@ describe('TapEventsService', () => {
         }),
       });
 
+      console.log('LOG_DATA: ', rows[0], testRowTap);
+
       expect(rows[0]).toEqual({
-        eventId: testTap.eventId,
-        deviceName: testTap.deviceName,
-        timestamp: testTap.timestamp,
-        event: testTap.event,
-        status: testTap.status,
+        eventId: testRowTap.eventId,
+        deviceName: testRowTap.deviceName,
+        timestamp: testRowTap.timestamp,
+        event: testRowTap.event,
+        status: testRowTap.status,
       });
 
       expect(summary).toEqual(mockSummary);

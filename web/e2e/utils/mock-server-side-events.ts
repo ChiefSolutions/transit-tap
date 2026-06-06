@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { TapResponse } from '../../src/app/taps/models';
+import { TapResponse } from '../../src/app/taps/types';
 
 export const mockServerSideEvents = async (url: string, page: Page, events: TapResponse[]) => {
   await page.route(url, async (route) => {

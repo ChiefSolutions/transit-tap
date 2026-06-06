@@ -6,6 +6,6 @@ namespace Api.Models;
 public enum TapStatus
 {
     Success,
-    DeniedInsufficientFunds,
+    Declined,
     SystemError
 }

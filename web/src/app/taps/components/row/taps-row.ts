@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { TapTableRow } from '../../models';
+import { TapTableRow } from '../../types';
 import { DatePipe } from '@angular/common';
 import { TapEventLabelMap } from '../../../constants';
 

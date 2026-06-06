@@ -1,6 +1,6 @@
 import { TapEventLabelMap } from '../../constants';
 
-export type TapStatus = 'Success' | 'DeniedInsufficientFunds' | 'SystemError';
+export type TapStatus = 'Success' | 'Declined' | 'SystemError';
 export type TapEvent = 'TapIn' | 'TapOut';
 type TapRowEventLabel = (typeof TapEventLabelMap)[keyof typeof TapEventLabelMap];
 

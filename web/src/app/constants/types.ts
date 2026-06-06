@@ -2,7 +2,7 @@ export interface TapEventLabelMapper {
   TapIn: string;
   TapOut: string;
   Success: string;
-  DeniedInsufficientFunds: string;
+  Declined: string;
   SystemError: string;
   [key: string]: string;
 }

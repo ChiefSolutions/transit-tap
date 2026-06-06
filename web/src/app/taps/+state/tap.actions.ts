@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { TapRowWithStats, TableSort } from '../models';
+import { TapRowWithStats, TableSort } from '../types';
 
 export const TapActions = createActionGroup({
   source: 'Tap Domain',

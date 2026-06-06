@@ -2,7 +2,7 @@ import { Component, WritableSignal, signal, Input, Output, EventEmitter } from '
 import { TapsRow } from '../row/taps-row';
 import { TapsListTableColumns } from '../../../constants';
 import { TapsListTableColumnsNames } from '../../../constants/types';
-import { TapTableRow, TableSort, SortDirection } from '../../models';
+import { TapTableRow, TableSort, SortDirection } from '../../types';
 
 @Component({
   selector: 'app-taps-list-table',

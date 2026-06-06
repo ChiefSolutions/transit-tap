@@ -1,19 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TapsList } from './taps-list';
 import { TapsStats } from './components';
-import {
-  initialState,
-  selectRows,
-  selectIsLoading,
-  selectIsConnected,
-  selectStats,
-} from './+state/tap.reducer';
+import { initialState, selectRows, selectIsLoading, selectIsConnected, selectStats } from './+state/tap.reducer';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { mockTapTableRowData } from 'tests/mocks/data';
 import { getDefaultTapEventsSummary } from './utils';
 import { EventEmitter } from '@angular/core';
 import { getTapsListTestChildren } from 'tests/utils';
-import { TableSort } from './models';
+import { TableSort } from './types';
 import { TapActions } from './+state/tap.actions';
 
 const mockTap = mockTapTableRowData[0];
@@ -49,14 +43,7 @@ describe('TapsList', () => {
     });
 
     it('Should set the data states on the child components', async () => {
-      const {
-        headerDebugEl,
-        statsDebugEl,
-        tableDebugEl,
-        headerInstance,
-        statsInstance,
-        tableInstance,
-      } = getTapsListTestChildren(fixture);
+      const { headerDebugEl, statsDebugEl, tableDebugEl, headerInstance, statsInstance, tableInstance } = getTapsListTestChildren(fixture);
 
       expect(headerDebugEl).toBeTruthy();
       expect(statsDebugEl).toBeTruthy();

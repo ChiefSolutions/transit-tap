@@ -1,9 +1,9 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { TapTableRow, TapEventsSummary, SortDirection } from '../models';
+import { TapTableRow, TapEventsSummary, SortDirection } from '../types';
 import { TapActions } from './tap.actions';
-import { getDefaultTapEventsSummary, sortRows } from '../utils';
+import { getDefaultTapEventsSummary, sortTapsResponseData } from '../utils';
 
-export interface State {
+export interface TapState {
   rows: TapTableRow[];
   sortColumn: keyof TapTableRow;
   unsortedRows: TapTableRow[];
@@ -14,7 +14,7 @@ export interface State {
   error: Error | null;
 }
 
-export const initialState: State = {
+export const initialState: TapState = {
   rows: [],
   unsortedRows: [],
   sortColumn: '',
@@ -38,55 +38,40 @@ export const tapFeature = createFeature({
     })),
 
     on(TapActions.eventReceived, (state, { tap, summary }) => {
-      const nextUnsorted = [tap, ...state.unsortedRows];
-      let nextDisplayRows: TapTableRow[];
+      const { sortDirection, unsortedRows, rows, sortColumn } = state;
+      const shouldSort = sortDirection !== 'none';
+      const unsorted = [tap, ...unsortedRows];
+      let sortedRows: TapTableRow[] = [];
 
-      if (nextUnsorted.length > 200) {
-        nextUnsorted.length = 200;
-      }
-
-      if (state.sortDirection === 'none') {
-        nextDisplayRows = nextUnsorted;
-      } else {
-        const activeColumn = state.sortColumn;
-
-        nextDisplayRows = [tap, ...state.rows];
-
-        if (nextDisplayRows.length > 200) {
-          nextDisplayRows.length = 200;
-        }
-
-        nextDisplayRows = sortRows(nextDisplayRows, activeColumn, state.sortDirection);
+      if (shouldSort) {
+        sortedRows = [tap, ...rows];
+        sortedRows = sortTapsResponseData(sortedRows, sortColumn, sortDirection);
       }
 
       return {
         ...state,
-        unsortedRows: nextUnsorted,
-        rows: nextDisplayRows,
+        unsortedRows: unsorted,
+        rows: shouldSort ? sortedRows : unsorted,
         stats: summary,
         isLoading: false,
         isConnected: true,
-        error: null,
       };
     }),
 
     on(TapActions.sort, (state, { column, direction }) => {
-      if (direction === 'none') {
-        return {
-          ...state,
-          sortColumn: '',
-          sortDirection: direction,
-          rows: state.unsortedRows,
-        };
-      }
+      let sortedRows: TapTableRow[] = [];
+      const { unsortedRows } = state;
+      const shouldSort = direction !== 'none';
 
-      const sortedRows = sortRows([...state.unsortedRows], column, direction);
+      if (shouldSort) {
+        sortedRows = sortTapsResponseData([...state.unsortedRows], column, direction);
+      }
 
       return {
         ...state,
-        sortColumn: column,
+        sortColumn: shouldSort ? column : '',
         sortDirection: direction,
-        rows: sortedRows,
+        rows: shouldSort ? sortedRows : unsortedRows,
       };
     }),
 
@@ -107,5 +92,4 @@ export const tapFeature = createFeature({
   ),
 });
 
-export const { selectRows, selectStats, selectIsLoading, selectIsConnected, selectError } =
-  tapFeature;
+export const { selectRows, selectStats, selectIsLoading, selectIsConnected, selectError } = tapFeature;

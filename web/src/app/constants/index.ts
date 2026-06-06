@@ -4,7 +4,7 @@ export const TapEventLabelMap: TapEventLabelMapper = {
   TapIn: 'Tap In',
   TapOut: 'Tap Out',
   Success: 'Success',
-  DeniedInsufficientFunds: 'Declined',
+  Declined: 'Declined',
   SystemError: 'System Error',
 };
 

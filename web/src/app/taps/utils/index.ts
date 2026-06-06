@@ -1,4 +1,4 @@
-import { TapTableRow } from '../models';
+import { TapTableRow } from '../types';
 
 export const getDefaultTapEventsSummary = () => ({
   total: 0,
@@ -8,11 +8,7 @@ export const getDefaultTapEventsSummary = () => ({
   errors: 0,
 });
 
-export function sortRows(
-  rows: TapTableRow[],
-  column: keyof TapTableRow,
-  direction: 'asc' | 'desc' | 'none',
-): TapTableRow[] {
+export function sortTapsResponseData(rows: TapTableRow[], column: keyof TapTableRow, direction: 'asc' | 'desc' | 'none'): TapTableRow[] {
   const isAsc = direction === 'asc';
 
   return rows.sort((a, b) => {
