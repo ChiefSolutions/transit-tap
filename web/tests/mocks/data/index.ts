@@ -1,88 +1,10 @@
 import { TapTableRow, TapEventsSummary, TapResponse } from '../../../src/app/taps/types';
 import { mapTapEventResponse } from 'tests/utils';
+import data from '../../data/data.json';
 
-export const mockTapEventsResponse: TapResponse[] = [
-  {
-    tap: {
-      eventId: '40ec8a7e-81ea-4082-b2c2-a6da768dfa90',
-      deviceId: 'c48e9440-481c-4c5e-8a96-a2fef196ba6b',
-      deviceName: 'TRAM LINE 03',
-      timestamp: '2026-06-06T00:53:01.319228Z',
-      cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
-      event: 'TapOut',
-      status: 'Declined',
-    },
-    summary: { total: 1, tapIns: 0, tapOuts: 1, declined: 1, errors: 0 },
-  },
-  {
-    tap: {
-      eventId: 'a216d38e-3e5d-4ba8-ab88-0de8c8959f67',
-      deviceId: 'e44e90f5-f395-40b7-ac86-3414ba9ff11a',
-      deviceName: 'BUS LINE 01',
-      timestamp: '2026-06-06T00:53:02.250966Z',
-      cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
-      event: 'TapOut',
-      status: 'Success',
-    },
-    summary: { total: 2, tapIns: 0, tapOuts: 2, declined: 1, errors: 0 },
-  },
-  {
-    tap: {
-      eventId: '73001149-d9cf-47de-9dfc-758af91a9ea9',
-      deviceId: '5421a88e-5793-41d3-a68c-5f620d15f8fc',
-      deviceName: 'BUS LINE 03',
-      timestamp: '2026-06-06T00:53:03.178843Z',
-      cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
-      event: 'TapIn',
-      status: 'Success',
-    },
-    summary: { total: 3, tapIns: 1, tapOuts: 2, declined: 1, errors: 0 },
-  },
-  {
-    tap: {
-      eventId: '39be8542-6006-4175-ab97-d9edf3225a79',
-      deviceId: '10a0176f-ba77-446f-b75d-94bd8b903577',
-      deviceName: 'TRAM LINE 02',
-      timestamp: '2026-06-06T00:53:04.83527Z',
-      cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
-      event: 'TapIn',
-      status: 'Declined',
-    },
-    summary: { total: 4, tapIns: 2, tapOuts: 2, declined: 2, errors: 0 },
-  },
-  {
-    tap: {
-      eventId: 'ed0af855-3602-4386-b0f2-c45aca124f8a',
-      deviceId: '5421a88e-5793-41d3-a68c-5f620d15f8fc',
-      deviceName: 'BUS LINE 03',
-      timestamp: '2026-06-06T00:53:07.13851Z',
-      cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
-      event: 'TapIn',
-      status: 'Success',
-    },
-    summary: { total: 5, tapIns: 3, tapOuts: 2, declined: 2, errors: 0 },
-  },
-  {
-    tap: {
-      eventId: '7a018253-9d8f-4054-b8a1-52578b09c03a',
-      deviceId: 'e44e90f5-f395-40b7-ac86-3414ba9ff11a',
-      deviceName: 'TRAM LINE 01',
-      timestamp: '2026-06-06T00:53:08.253696Z',
-      cardToken: 'tkn_27rSqew9gZSjJ45xSi1yqKfa',
-      event: 'TapOut',
-      status: 'Declined',
-    },
-    summary: { total: 6, tapIns: 3, tapOuts: 3, declined: 3, errors: 0 },
-  },
-];
+export const mockTapEventsResponse: TapResponse[] = data.taps as TapResponse[];
 
 export const mockTapTableRowData: TapTableRow[] = mockTapEventsResponse.map(mapTapEventResponse);
 
 // Get from last event in mockTapEventsResponse
-export const mockSummary: TapEventsSummary = {
-  total: 4,
-  tapIns: 1,
-  tapOuts: 3,
-  declined: 2,
-  errors: 0,
-};
+export const mockSummary: TapEventsSummary = { total: 6, tapIns: 3, tapOuts: 3, declined: 3, errors: 0 };

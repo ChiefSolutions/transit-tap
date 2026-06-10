@@ -8,8 +8,8 @@
               {{ column.text }}
             </span>
 
-          @if(columnSort().direction !== 'none') {
-            <span class="TapsListTable-tableHeaderSort">{{ columnSort().column === column.name ? (columnSort().direction === 'asc' ? '▲' : '▼') : '' }}</span>
+          @if(columnSort().direction !== 'none' && columnSort().column === column.name) {
+            <span data-testid="table-header-colum-sort-icon" class="TapsListTable-tableHeaderSort">{{ (columnSort().direction === 'asc' ? '▲' : '▼') }}</span>
           }
         </button>
       </th>

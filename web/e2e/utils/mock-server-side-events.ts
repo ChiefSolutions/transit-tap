@@ -1,7 +1,8 @@
 import { Page } from '@playwright/test';
-import { TapResponse } from '../../src/app/taps/types';
+import data from '../../tests/data/data.json';
 
-export const mockServerSideEvents = async (url: string, page: Page, events: TapResponse[]) => {
+const events = data.taps;
+export const mockServerSideEvents = async (url: string, page: Page) => {
   await page.route(url, async (route) => {
     const body = events.map((ev) => `data: ${JSON.stringify(ev)}\n\n`).join('');
 
@@ -16,4 +17,8 @@ export const mockServerSideEvents = async (url: string, page: Page, events: TapR
       body,
     });
   });
+};
+
+export const mockData = () => {
+  return data.taps;
 };

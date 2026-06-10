@@ -76,13 +76,7 @@ describe('TapsList', () => {
   describe('when data is fetched', () => {
     beforeEach(() => {
       mockStore.overrideSelector(selectRows, [mockTap]);
-      mockStore.overrideSelector(selectStats, {
-        total: 1,
-        tapIns: 0,
-        tapOuts: 1,
-        declined: 0,
-        errors: 0,
-      });
+      mockStore.overrideSelector(selectStats, { total: 1, tapIns: 0, tapOuts: 1, declined: 0, errors: 0 });
       mockStore.overrideSelector(selectIsLoading, false);
       mockStore.overrideSelector(selectIsConnected, true);
       mockStore.refreshState();

@@ -4,7 +4,6 @@ import { By } from '@angular/platform-browser';
 import { ComponentFixture } from '@angular/core/testing';
 import { TapsList, TapActions } from '../../src/app/taps';
 import { TapResponse, TapTableRow, TapRowWithStats, TableSort } from '../../src/app/taps/types';
-// import { mockTapEventsResponse } from 'tests/mocks/data';
 import { initialState, TapState } from '../../src/app/taps/+state/tap.reducer';
 import { Action, ActionReducer } from '@ngrx/store';
 

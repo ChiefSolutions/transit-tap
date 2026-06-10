@@ -6,6 +6,7 @@ import { TapTableRow } from '../types';
 import { mockTapEventsResponse, mockSummary, mockTapTableRowData } from 'tests/mocks/data';
 
 const EventSourceMock = vi.fn(MockEventSource);
+const eventSourceError = new Event('error');
 const testTap = mockTapEventsResponse[0].tap;
 
 describe('TapEventsService', () => {
@@ -55,8 +56,6 @@ describe('TapEventsService', () => {
         }),
       });
 
-      console.log('LOG_DATA: ', rows[0], testRowTap);
-
       expect(rows[0]).toEqual({
         eventId: testRowTap.eventId,
         deviceName: testRowTap.deviceName,
@@ -103,10 +102,10 @@ describe('TapEventsService', () => {
       const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
       instance.readyState = 1;
-      instance.onerror(new Event('Open error'));
+      instance.onerror(eventSourceError);
 
       expect(instance.close).toHaveBeenCalled();
-      expect(openError).toBe('Open error');
+      expect(openError).toBe('error');
     });
   });
 
@@ -125,7 +124,7 @@ describe('TapEventsService', () => {
       const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
       instance.readyState = 2;
-      instance.onerror(new Event('Close error'));
+      instance.onerror(eventSourceError);
 
       expect(instance.close).not.toHaveBeenCalled();
       expect(closedError).toBe(undefined);
@@ -147,10 +146,10 @@ describe('TapEventsService', () => {
       const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
       instance.readyState = 0;
-      instance.onerror(new Event('Connecting error'));
+      instance.onerror(eventSourceError);
 
       expect(instance.close).to.toHaveBeenCalled();
-      expect(connectingError).toBe('Connecting error');
+      expect(connectingError).toBe('error');
     });
   });
 });

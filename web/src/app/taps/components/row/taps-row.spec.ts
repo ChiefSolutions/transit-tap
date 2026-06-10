@@ -27,8 +27,6 @@ describe('TapSRow', () => {
     await fixture.whenStable();
   });
 
-  console.log('LOG_ROW_DATA: ', testTapRowData);
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
