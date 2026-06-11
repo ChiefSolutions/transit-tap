@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { TapRowWithStats, TableSort } from '../types';
+import { TapRowWithStats, TableSort, TapStatName } from '../types';
 
 export const TapActions = createActionGroup({
   source: 'Tap Domain',
@@ -7,6 +7,7 @@ export const TapActions = createActionGroup({
     connectStream: emptyProps(),
     eventReceived: props<TapRowWithStats>(),
     sort: props<TableSort>(),
+    filter: props<{ name: TapStatName }>(),
     streamError: props<{ error: Error }>(),
     disconnectStream: emptyProps(),
   },

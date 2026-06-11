@@ -3,7 +3,10 @@
   <tr>
     @for(column of columnNames; track column.name) {
       <th data-testid="table-header-colum">
-        <button class="TapsListTable-tableHeaderButton" (click)="onColumnSort(column.name)">
+        <button class="TapsListTable-tableHeaderButton"
+                type="button"
+                [attr.aria-label]="`Table header button for sorting ${column.text} ascending or descending `"
+                (click)="onColumnSort(column.name, $event)">
             <span class="TapsListTable-tableHeaderButtonText">
               {{ column.text }}
             </span>
@@ -19,14 +22,14 @@
   <tbody>
     @if (isLoading) {
       <tr>
-        @for(_ of columnNames; track $index) {
+        @for(i of skeletons; track i) {
           <td><span class="TapsListTable-loader"></span></td>
         }
       </tr>
     }
 
     @for (row of data; track row.eventId) {
-      <tr app-tap-row data-testid="row-data" [data]="row"></tr>
+      <app-tap-row data-testid="row-data" [data]="row"></app-tap-row>
     } @empty {
       <tr>
         <td colspan="4"><span class="TapsListTable-noDataLabel">No data to display at the moment.</span></td>

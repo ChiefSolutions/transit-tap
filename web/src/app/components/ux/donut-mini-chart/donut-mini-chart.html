@@ -1,0 +1,50 @@
+<svg [attr.width]="size()"
+     [attr.height]="size()"
+     [attr.aria-label]="ariaLabel()"
+     viewBox="0 0 200 200" role="img"
+     aria-hidden="true"
+     focusable="false">
+  <circle cx="100" cy="100" r="70" fill="none" stroke="var(--colour-ash-black)" stroke-width="18" />
+
+  <circle
+    cx="100"
+    cy="100"
+    r="70"
+    fill="none"
+    stroke="var(--colour-background-secondary)"
+    stroke-width="18"
+    stroke-linecap="round"
+    [attr.stroke-dasharray]="outDash()"
+    [attr.transform]="outTransform()"
+    class="arc"
+  />
+
+  @if (initial() > 0) {
+    <circle
+      cx="100"
+      cy="100"
+      r="70"
+      [ngClass]="progressCssClass()"
+      fill="none"
+      stroke-width="18"
+      stroke-linecap="round"
+      [attr.stroke-dasharray]="inDash()"
+      transform="rotate(-90 100 100)"
+      data-animate="true"
+      class="arc"
+    />
+  }
+
+  <text
+    x="100"
+    y="107"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-size="22"
+    font-weight="500"
+    fill="var(--color-text-primary)"
+    font-family="var(--font-sans, sans-serif)"
+  >
+    {{ pctLabel() }}
+  </text>
+</svg>

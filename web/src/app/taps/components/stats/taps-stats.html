@@ -1,6 +1,22 @@
 @for (stat of stats(); track $index;) {
-  <div class="TapsStats-stat">
-    <span data-testid="stats-label">{{stat.label}}</span>
-    <span class="TapsStats-value">{{stat.value}}</span>
-  </div>
+  <button class="TapsStats-stat"
+          type="button"
+          [name]="stat.name"
+          data-testid="stat-button"
+          [attr.aria-label]="`Button for ${stat.label} stats`"
+          (click)="filterTable.emit({ name: stat.name, event: $event })">
+    <div class="TapsStats-iconLabel">
+      <app-icon [name]="stat.icon" class="TapsStats-icon" [ngClass]="getCssClass()[stat.name]"></app-icon>
+      <span data-testid="stats-label" [ngClass]="getCssClass()[stat.name]">{{stat.label}}</span>
+    </div>
+    <span class="TapsStats-value" [ngClass]="getCssClass()[stat.name]">{{stat.value}}</span>
+
+    @if (stat.name !== 'Total'){
+      <app-donut-mini-chart class="TapsStats-donut"
+                            [attr.aria-label]=""
+                            [initial]="stat.value"
+                            [total]="summary().total"
+                            [progressCssClass]="getChartCssClass()[stat.name]" />
+    }
+  </button>
 }

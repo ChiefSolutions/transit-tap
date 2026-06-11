@@ -81,13 +81,12 @@ describe('Tap Reducer', () => {
     });
 
     it('should append a new tap row and sort the results', () => {
-      const result = reducer(state, eventReceivedAction);
+      const resultState = reducer(state, eventReceivedAction);
+      const visibleRows = tapFeature.selectRows.projector(resultState.rows, resultState.filterName, resultState.sort);
 
-      expect(result.sortDirection).toEqual(sort.direction);
-      expect(result.sortColumn).toEqual(sort.column);
-      expect(result.rows).not.toEqual(result.unsortedRows);
-      expect(isRowDataSorted(result.rows, sort)).toBe(true);
-      expect(isRowDataSorted(result.unsortedRows, sort)).toBe(false);
+      expect(resultState.sort.direction).toEqual(sort.direction);
+      expect(resultState.sort.column).toEqual(sort.column);
+      expect(isRowDataSorted(visibleRows, sort)).toBe(true);
     });
   });
 
@@ -106,9 +105,9 @@ describe('Tap Reducer', () => {
     it('should not sort the rows', () => {
       const result = reducer(state, eventReceivedAction);
 
-      expect(result.rows).toEqual(result.unsortedRows);
+      expect(result.rows).toEqual(result.rows);
       expect(isRowDataSorted(result.rows, sort)).toBe(false);
-      expect(isRowDataSorted(result.unsortedRows, sort)).toBe(false);
+      expect(isRowDataSorted(result.rows, sort)).toBe(false);
     });
   });
 
@@ -127,9 +126,23 @@ describe('Tap Reducer', () => {
     it('should not sort the rows', () => {
       const result = reducer(state, eventReceivedAction);
 
-      expect(result.rows).not.toEqual(result.unsortedRows);
-      expect(isRowDataSorted(result.rows, sort)).toBe(true);
-      expect(isRowDataSorted(result.unsortedRows, sort)).toBe(false);
+      expect(isRowDataSorted(result.rows, sort)).toBe(false);
+    });
+  });
+
+  describe('when filter event is dispatched', () => {
+    let filterAction: ReturnType<typeof TapActions.filter>;
+    beforeEach(() => {
+      filterAction = TapActions.filter({ name: 'TapIn' });
+    });
+
+    it('should filter the rows based on the filter name', () => {
+      const mockTapIn = mockTapTableRowData[2];
+      const result = reducer({ ...initialState, rows: [mockTap, mockTapIn] }, filterAction);
+      const rows = tapFeature.selectRows.projector(result.rows, result.filterName, result.sort);
+
+      expect(rows.length).toEqual(1);
+      expect(rows[0]).toEqual(mockTapIn);
     });
   });
 

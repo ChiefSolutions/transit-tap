@@ -60,20 +60,24 @@ export const isRowDataSorted = (collection: TapTableRow[], sort: TableSort) => {
 };
 
 export const dispatchTestReducerActions = (data: TapResponse[], reducer: ActionReducer<TapState>, sort: TableSort) => {
-  let eventReceivedAction: TapRowWithStats & Action<'[Tap Domain] eventReceived'>;
+  let eventReceivedAction: ReturnType<typeof TapActions.eventReceived>;
   let state: TapState;
 
   const response = data.slice(0, 3);
   const rowData = response.map(mapTapEventResponse);
 
-  const sortAction: TableSort & Action<'[Tap Domain] sort'> = TapActions.sort(sort);
-  eventReceivedAction = TapActions.eventReceived({ tap: rowData[0], summary: response[0].summary });
+  const sortAction = TapActions.sort(sort);
 
+  eventReceivedAction = TapActions.eventReceived({ tap: rowData[0], summary: response[0].summary });
   state = reducer(initialState, eventReceivedAction);
+
   state = reducer(state, sortAction);
+
   eventReceivedAction = TapActions.eventReceived({ tap: rowData[1], summary: response[1].summary });
   state = reducer(state, eventReceivedAction);
+
   eventReceivedAction = TapActions.eventReceived({ tap: rowData[2], summary: response[2].summary });
+  state = reducer(state, eventReceivedAction); // ✅ FIXED: Actually update the state with Row 2
 
   return { eventReceivedAction, state };
 };

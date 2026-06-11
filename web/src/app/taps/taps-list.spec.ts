@@ -7,8 +7,10 @@ import { mockTapTableRowData } from 'tests/mocks/data';
 import { getDefaultTapEventsSummary } from './utils';
 import { EventEmitter } from '@angular/core';
 import { getTapsListTestChildren } from 'tests/utils';
-import { TableSort } from './types';
+import { TableSort, TapStatName } from './types';
 import { TapActions } from './+state/tap.actions';
+import { MockInstance } from 'vitest';
+import { By } from '@angular/platform-browser';
 
 const mockTap = mockTapTableRowData[0];
 describe('TapsList', () => {
@@ -18,7 +20,13 @@ describe('TapsList', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      providers: [provideMockStore({ initialState })],
+      providers: [
+        provideMockStore({
+          initialState: {
+            tap: initialState,
+          },
+        }),
+      ],
       imports: [TapsStats],
     }).compileComponents();
 
@@ -26,6 +34,10 @@ describe('TapsList', () => {
     fixture = TestBed.createComponent(TapsList);
     component = fixture.componentInstance;
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it('should create', () => {
@@ -93,12 +105,14 @@ describe('TapsList', () => {
     });
   });
 
-  describe('when sorting is emitted', () => {
+  describe('when sorting is called', () => {
     const value: TableSort = { column: 'deviceName', direction: 'asc' };
+    let sortSpy: MockInstance;
+    let dispatchSpy: MockInstance;
 
     beforeEach(() => {
-      vi.spyOn(component, 'onSortChange');
-      vi.spyOn(mockStore, 'dispatch');
+      sortSpy = vi.spyOn(component, 'onSortChange');
+      dispatchSpy = vi.spyOn(mockStore, 'dispatch');
 
       const { tableInstance } = getTapsListTestChildren(fixture);
 
@@ -109,6 +123,34 @@ describe('TapsList', () => {
     it('should dispatch sorting to the store', () => {
       expect(component.onSortChange).toHaveBeenCalledWith(value);
       expect(mockStore.dispatch).toHaveBeenCalledWith(TapActions.sort(value));
+
+      sortSpy.mockClear();
+      dispatchSpy.mockClear();
+    });
+  });
+
+  describe('when filtering is called', () => {
+    const value: { name: TapStatName; event: Event } = { name: 'Total', event: new MouseEvent('click') };
+    let filterSpy: MockInstance;
+    let dispatchSpy: MockInstance;
+
+    beforeEach(() => {
+      filterSpy = vi.spyOn(component, 'onFilterChange');
+      dispatchSpy = vi.spyOn(mockStore, 'dispatch');
+
+      const statsDebugElement = fixture.debugElement.query(By.directive(TapsStats));
+      const statsInstance = statsDebugElement.componentInstance as TapsStats;
+
+      statsInstance.filterTable.emit(value);
+      fixture.detectChanges();
+    });
+
+    it('should dispatch filtering to the store', () => {
+      expect(filterSpy).toHaveBeenCalledWith(value);
+      expect(dispatchSpy).toHaveBeenCalledWith(TapActions.filter({ name: value.name }));
+
+      filterSpy.mockClear();
+      dispatchSpy.mockClear();
     });
   });
 });

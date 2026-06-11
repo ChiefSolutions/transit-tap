@@ -1,4 +1,5 @@
 import { TapEventLabelMap } from '../../constants';
+import { IconKey } from '../../constants/types';
 
 export type TapStatus = 'Success' | 'Declined' | 'SystemError';
 export type TapEvent = 'TapIn' | 'TapOut';
@@ -41,9 +42,12 @@ export interface TapRowWithStats {
   summary: TapEventsSummary;
 }
 
+export type TapStatName = TapEvent | TapStatus | 'Total';
 export interface TapStat {
+  name: TapStatName;
   label: string;
   value: number;
+  icon: IconKey;
 }
 
 export type SortDirection = 'none' | 'asc' | 'desc';

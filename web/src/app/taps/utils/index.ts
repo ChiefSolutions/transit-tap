@@ -1,4 +1,4 @@
-import { TapTableRow } from '../types';
+import { TapTableRow, TableSort } from '../types';
 
 export const getDefaultTapEventsSummary = () => ({
   total: 0,
@@ -8,15 +8,19 @@ export const getDefaultTapEventsSummary = () => ({
   errors: 0,
 });
 
-export function sortTapsResponseData(rows: TapTableRow[], column: keyof TapTableRow, direction: 'asc' | 'desc' | 'none'): TapTableRow[] {
+const stringCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+export function sortTapsResponseData(rows: TapTableRow[], sort: TableSort): TapTableRow[] {
+  const { direction, column } = sort;
+  if (!direction || direction === 'none' || !column) return rows;
+
   const isAsc = direction === 'asc';
 
-  return rows.sort((a, b) => {
-    if (a[column] === b[column]) {
-      return 0;
-    }
-
-    const cmp = a[column] > b[column] ? 1 : -1;
-    return isAsc ? cmp : -cmp;
-  });
+  // 2. Optimization: Split the conditional checks OUTSIDE the hot loop
+  if (isAsc) {
+    return rows.sort((a, b) => stringCollator.compare(a[column] as string, b[column] as string));
+  } else {
+    // Reverse sorting is achieved by flipping the argument positions inside the collator
+    return rows.sort((a, b) => stringCollator.compare(b[column] as string, a[column] as string));
+  }
 }

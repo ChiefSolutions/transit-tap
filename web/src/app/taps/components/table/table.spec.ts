@@ -86,7 +86,7 @@ describe('Table', () => {
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'asc' });
     });
   });
@@ -114,19 +114,19 @@ describe('Table', () => {
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'asc' });
 
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'desc' });
 
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'none' });
     });
   });

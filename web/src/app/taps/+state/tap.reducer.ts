@@ -1,13 +1,12 @@
-import { createFeature, createReducer, on } from '@ngrx/store';
-import { TapTableRow, TapEventsSummary, SortDirection } from '../types';
+import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
+import { TapTableRow, TapEventsSummary, TapStatName, TableSort } from '../types';
 import { TapActions } from './tap.actions';
 import { getDefaultTapEventsSummary, sortTapsResponseData } from '../utils';
 
 export interface TapState {
+  filterName: TapStatName;
   rows: TapTableRow[];
-  sortColumn: keyof TapTableRow;
-  unsortedRows: TapTableRow[];
-  sortDirection: SortDirection;
+  sort: TableSort;
   stats: TapEventsSummary;
   isLoading: boolean;
   isConnected: boolean;
@@ -15,10 +14,9 @@ export interface TapState {
 }
 
 export const initialState: TapState = {
+  filterName: 'Total',
   rows: [],
-  unsortedRows: [],
-  sortColumn: '',
-  sortDirection: 'none',
+  sort: { column: '', direction: 'none' },
   stats: getDefaultTapEventsSummary(),
   isLoading: false,
   isConnected: false,
@@ -29,67 +27,37 @@ export const tapFeature = createFeature({
   name: 'tap',
   reducer: createReducer(
     initialState,
-
     on(TapActions.connectStream, (state) => ({
       ...state,
       isLoading: true,
       isConnected: false,
       error: null,
     })),
+    on(TapActions.eventReceived, (state, { tap, summary }): TapState => {
+      const rows = [tap, ...state.rows];
 
-    on(TapActions.eventReceived, (state, { tap, summary }) => {
-      const { sortDirection, unsortedRows, rows, sortColumn } = state;
-      const shouldSort = sortDirection !== 'none';
-      const unsorted = [tap, ...unsortedRows];
-      let sortedRows: TapTableRow[] = [];
-
-      if (shouldSort) {
-        sortedRows = [tap, ...rows];
-        sortedRows = sortTapsResponseData(sortedRows, sortColumn, sortDirection);
-      }
-
-      return {
-        ...state,
-        unsortedRows: unsorted,
-        rows: shouldSort ? sortedRows : unsorted,
-        stats: summary,
-        isLoading: false,
-        isConnected: true,
-      };
+      return { ...state, rows, stats: summary, isLoading: false, isConnected: true };
     }),
-
-    on(TapActions.sort, (state, { column, direction }) => {
-      let sortedRows: TapTableRow[] = [];
-      const { unsortedRows } = state;
-      const shouldSort = direction !== 'none';
-
-      if (shouldSort) {
-        sortedRows = sortTapsResponseData([...state.unsortedRows], column, direction);
-      }
-
-      return {
-        ...state,
-        sortColumn: shouldSort ? column : '',
-        sortDirection: direction,
-        rows: shouldSort ? sortedRows : unsortedRows,
-      };
-    }),
-
-    on(TapActions.streamError, (state, { error }) => ({
-      ...state,
-      isLoading: false,
-      isConnected: false,
-      error: error,
-    })),
-
-    on(TapActions.disconnectStream, (state) => ({
-      ...state,
-      isLoading: false,
-      isConnected: false,
-      rows: [],
-      unsortedRows: [],
-    })),
+    on(TapActions.sort, (state, sort): TapState => ({ ...state, sort })),
+    on(TapActions.filter, (state, { name }): TapState => ({ ...state, filterName: name })),
+    on(TapActions.streamError, (state, { error }): TapState => ({ ...state, isLoading: false, isConnected: false, error })),
+    on(TapActions.disconnectStream, (state): TapState => ({ ...state, isLoading: false, isConnected: false, rows: [] })),
   ),
+
+  extraSelectors: ({ selectRows, selectFilterName, selectSort }) => ({
+    selectRows: createSelector(selectRows, selectFilterName, selectSort, (rows, filterName, sort) => {
+      const shouldFilter = !!filterName && filterName !== 'Total';
+      const shouldSort = sort && sort.direction !== 'none';
+
+      let processedRows = shouldFilter ? rows.filter((row) => row.event === filterName || row.status === filterName) : [...rows];
+
+      if (shouldSort) {
+        processedRows = sortTapsResponseData(processedRows, sort);
+      }
+
+      return processedRows;
+    }),
+  }),
 });
 
 export const { selectRows, selectStats, selectIsLoading, selectIsConnected, selectError } = tapFeature;

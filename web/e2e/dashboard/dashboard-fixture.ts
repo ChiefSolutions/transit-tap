@@ -6,13 +6,11 @@ import { sortTapsResponseData } from '../../src/app/taps/utils';
 import { TableSort, TapTableRow } from '../../src/app/taps/types';
 import { TapEventLabelMap } from '../../src/app/constants';
 
-// Define the shape of your fixtures
 interface DashboardFixtures {
   disconnectedDashboardPage: DashboardPage;
   liveDashboardPage: DashboardPage;
 }
 
-// Simple POM to encapsulate your locators/actions
 export class DashboardPage {
   public page: Page;
   public heading: Locator;
@@ -35,7 +33,7 @@ export class DashboardPage {
   }
 
   getStats() {
-    const statsCard = this.page.locator('div.TapsStats-stat');
+    const statsCard = this.page.locator('button.TapsStats-stat');
     const totalEventsTitle = statsCard.filter({ hasText: 'Total events' });
     const totalEvents = totalEventsTitle.locator('span.TapsStats-value');
     const totalTapInsTitle = statsCard.filter({ hasText: 'Tap ins' });
@@ -77,7 +75,7 @@ export class DashboardPage {
       return { deviceName, event: TapEventLabelMap[event], eventId, status, timestamp: formattedDate } as TapTableRow;
     });
 
-    return sortTapsResponseData(mapped, sort.column, sort.direction).map((row) => {
+    return sortTapsResponseData(mapped, sort).map((row) => {
       return row[sort.column];
     });
   }
