@@ -1,11 +1,16 @@
 # 🚍 🚋 Transit Tap
 
 TransitTap is a full-stack showcase monorepo simulating real-time public transport network data. The application mimics
-a high-throughput stream of passenger card "taps" across various urban transit networks, including buses and trams.
+a high-throughput stream of passenger card "taps" across various urban transit networks, including buses and trams. Angular on the frontend and .Net on the backend using Minimal Api.
 
-# 💻 Quick Demo
+# 💻 Demo
+The app receives server sent events then displays them on a dashboard in a table with cards above the table to filter by event and status. The table also sorts the data, by default the latest events are added at the top. The event streamer is cofigured to send an event every 1-2 seconds. You can see the functionality in the videos below.
 
-https://github.com/user-attachments/assets/94b0e976-cee3-4ec2-9e8e-2a72a936be08
+### Fetch, Display, Sort and Filter
+https://github.com/user-attachments/assets/3d98ecf9-3a68-4c53-8336-509920f11e40
+
+### Keyboard Accessibility
+https://github.com/user-attachments/assets/a8cf343e-a8db-4a73-bc12-ab7d40aea17b
 
 ## 📁 Repository Structure
 
