@@ -39,3 +39,17 @@ To run this entire stack locally, make sure you have the following installed:
 ### 2. Install package in both web and api projects
 
 ### 3. Run the api project first, then followed by the client
+
+## 📈 App Metrics
+These include: Unit test coverage and lighthouse pageload.
+
+### Unit test coverage:
+<img width="1708" height="789" alt="Screenshot 2026-06-19 at 19 36 26" src="https://github.com/user-attachments/assets/f4c43bef-609a-4684-9827-dd4fbf32287e" />
+
+### Lighthouse prod:
+<img width="549" height="399" alt="lighthouse-prod" src="https://github.com/user-attachments/assets/a897f1e5-0dfd-44dc-8786-ffe89f1433a9" />
+
+### Lighthouse prod:
+<img width="467" height="397" alt="lighthouse-dev" src="https://github.com/user-attachments/assets/beaef069-f843-4dc0-843e-de517095ae6e" />
+
+
