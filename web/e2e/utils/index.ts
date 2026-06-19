@@ -1,2 +1,1 @@
-export { getStatsValueLocators } from './get-stats-value-locators';
-export { mockServerSideEvents } from './mock-server-side-events';
+export { mockServerSideEvents, mockData } from './mock-server-side-events';

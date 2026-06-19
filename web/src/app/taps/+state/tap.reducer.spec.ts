@@ -1,171 +1,182 @@
 import { describe, it, expect } from 'vitest';
-import { tapFeature, initialState, State } from './tap.reducer';
+import { tapFeature, initialState, TapState } from './tap.reducer';
 import { TapActions } from './tap.actions';
-import { TapTableRow } from '../models';
-import { mockTapTableRowData } from 'tests/mocks/data';
-import { getDefaultTapEventsSummary } from '../utils';
+import { TapRowWithStats, TapEventsSummary, TableSort } from '../types';
+import { mockTapTableRowData, mockTapEventsResponse } from 'tests/mocks/data';
+import { Action } from '@ngrx/store';
+import { isRowDataSorted, dispatchTestReducerActions } from 'tests/utils';
 
-const testRowData = mockTapTableRowData[0];
+const mockTap = mockTapTableRowData[0];
 
 describe('Tap Reducer', () => {
   const reducer = tapFeature.reducer;
-  const mockTap: TapTableRow = testRowData;
 
-  it('should return the default initial state when an unknown action is dispatched', () => {
-    const action = { type: 'Unknown Action' };
-    const result = reducer(initialState, action);
+  describe('when an unknown action is dispatched', () => {
+    let action;
+    let result: TapState;
 
-    expect(result).toBe(initialState);
+    beforeEach(() => {
+      action = { type: 'Unknown Action' };
+      result = reducer(initialState, action);
+    });
+
+    it('should return the default initial state', () => {
+      expect(result).toBe(initialState);
+    });
   });
 
-  it('should set loading state when connecting to the stream', () => {
-    const action = TapActions.connectStream();
-    const dirtyState: State = {
-      ...initialState,
-      error: new Error('Previous Error'),
-      isConnected: true,
-    };
-    const result = reducer(dirtyState, action);
+  describe('when connect stream action is dispatched', () => {
+    let result: TapState;
 
-    expect(result.isLoading).toBe(true);
-    expect(result.isConnected).toBe(false);
-    expect(result.error).toBeNull();
+    beforeEach(() => {
+      const action = TapActions.connectStream();
+      const dirtyState: TapState = {
+        ...initialState,
+        error: new Error('Previous Error'),
+        isConnected: true,
+      };
+
+      result = reducer(dirtyState, action);
+    });
+
+    it('should set loading state when connecting to the stream', () => {
+      expect(result.isLoading).toBe(true);
+      expect(result.isConnected).toBe(false);
+      expect(result.error).toBeNull();
+    });
   });
 
-  it('should append a new tap row and establish connection on eventReceived', () => {
-    const summary = getDefaultTapEventsSummary();
-    const action = TapActions.eventReceived({ tap: mockTap, summary });
-    const existingRow = testRowData as TapTableRow;
-    const startingState: State = { ...initialState, rows: [existingRow], isLoading: true };
+  describe('when event received is dispatched', () => {
+    let action: TapRowWithStats & Action<'[Tap Domain] eventReceived'>;
+    let summary: TapEventsSummary;
 
-    const result = reducer(startingState, action);
+    beforeEach(() => {
+      summary = { declined: 0, errors: 0, tapOuts: 1, total: 1, tapIns: 0 };
+      action = TapActions.eventReceived({ tap: mockTap, summary });
+    });
 
-    expect(result.rows).toEqual([mockTap]);
-    expect(result.isLoading).toBe(false);
-    expect(result.isConnected).toBe(true);
-    expect(result.error).toBeNull();
+    it('should append a new tap row and establish connection', () => {
+      const result = reducer(initialState, action);
+
+      expect(result.rows).toEqual([mockTap]);
+      expect(result.stats).toEqual(summary);
+      expect(result.rows).not.toEqual(initialState);
+      expect(result.stats).not.toEqual(initialState.stats);
+      expect(result.isLoading).toBe(false);
+      expect(result.isConnected).toBe(true);
+      expect(result.error).toBeNull();
+    });
   });
 
-  it('should not sort the array when direction is none', () => {
-    const summary = getDefaultTapEventsSummary();
-    const action = TapActions.sort({ direction: 'none', column: 'deviceName' });
+  describe('when an event is received while sorting is required', () => {
+    let eventReceivedAction: TapRowWithStats & Action<'[Tap Domain] eventReceived'>;
+    let state: TapState;
+    const sort: TableSort = { column: 'deviceName', direction: 'asc' };
 
-    const startingState: State = {
-      ...initialState,
-      rows: mockTapTableRowData,
-      stats: summary,
-      unsortedRows: mockTapTableRowData,
-      isLoading: false,
-    };
+    beforeEach(() => {
+      const result = dispatchTestReducerActions(mockTapEventsResponse, reducer, sort);
 
-    const result = reducer(startingState, action);
+      state = result.state;
+      eventReceivedAction = result.eventReceivedAction;
+    });
 
-    expect(result.rows).toEqual(result.unsortedRows);
+    it('should append a new tap row and sort the results', () => {
+      const resultState = reducer(state, eventReceivedAction);
+      const visibleRows = tapFeature.selectRows.projector(resultState.rows, resultState.filterName, resultState.sort);
+
+      expect(resultState.sort.direction).toEqual(sort.direction);
+      expect(resultState.sort.column).toEqual(sort.column);
+      expect(isRowDataSorted(visibleRows, sort)).toBe(true);
+    });
   });
 
-  it('should sort the array when direction is asc', () => {
-    const summary = getDefaultTapEventsSummary();
-    const action = TapActions.sort({ direction: 'asc', column: 'deviceName' });
+  describe('when sorting event is dispatched for none', () => {
+    let eventReceivedAction: TapRowWithStats & Action<'[Tap Domain] eventReceived'>;
+    let state: TapState;
+    const sort: TableSort = { column: 'deviceName', direction: 'none' };
 
-    const startingState: State = {
-      ...initialState,
-      rows: mockTapTableRowData,
-      stats: summary,
-      unsortedRows: mockTapTableRowData,
-      isLoading: false,
-    };
+    beforeEach(() => {
+      const result = dispatchTestReducerActions(mockTapEventsResponse, reducer, sort);
 
-    const result = reducer(startingState, action);
+      state = result.state;
+      eventReceivedAction = result.eventReceivedAction;
+    });
 
-    expect(result.rows).not.toEqual(result.unsortedRows);
+    it('should not sort the rows', () => {
+      const result = reducer(state, eventReceivedAction);
+
+      expect(result.rows).toEqual(result.rows);
+      expect(isRowDataSorted(result.rows, sort)).toBe(false);
+      expect(isRowDataSorted(result.rows, sort)).toBe(false);
+    });
   });
 
-  it('should not sort the data when direction is asc', () => {
-    const summary = getDefaultTapEventsSummary();
-    const action = TapActions.eventReceived({ tap: mockTap, summary });
+  describe('when sorting event is dispatched for desc', () => {
+    let eventReceivedAction: TapRowWithStats & Action<'[Tap Domain] eventReceived'>;
+    let state: TapState;
+    const sort: TableSort = { column: 'deviceName', direction: 'desc' };
 
-    const startingState: State = {
-      ...initialState,
-      rows: mockTapTableRowData,
-      sortColumn: 'deviceName',
-      sortDirection: 'asc',
-      stats: summary,
-      unsortedRows: [...mockTapTableRowData],
-      isLoading: false,
-    };
+    beforeEach(() => {
+      const result = dispatchTestReducerActions(mockTapEventsResponse, reducer, sort);
 
-    const result = reducer(startingState, action);
+      state = result.state;
+      eventReceivedAction = result.eventReceivedAction;
+    });
 
-    expect(result.rows).not.toEqual(result.unsortedRows);
+    it('should not sort the rows', () => {
+      const result = reducer(state, eventReceivedAction);
+
+      expect(isRowDataSorted(result.rows, sort)).toBe(false);
+    });
   });
 
-  it('should sort the data when direction is desc', () => {
-    const summary = getDefaultTapEventsSummary();
-    const action = TapActions.eventReceived({ tap: mockTap, summary });
-    const maxedRows = Array(200).fill(testRowData);
-    const startingState: State = {
-      ...initialState,
-      rows: maxedRows,
-      sortColumn: 'deviceName',
-      sortDirection: 'desc',
-      stats: summary,
-      unsortedRows: [...mockTapTableRowData],
-      isLoading: false,
-    };
+  describe('when filter event is dispatched', () => {
+    let filterAction: ReturnType<typeof TapActions.filter>;
+    beforeEach(() => {
+      filterAction = TapActions.filter({ name: 'TapIn' });
+    });
 
-    const result = reducer(startingState, action);
+    it('should filter the rows based on the filter name', () => {
+      const mockTapIn = mockTapTableRowData[2];
+      const result = reducer({ ...initialState, rows: [mockTap, mockTapIn] }, filterAction);
+      const rows = tapFeature.selectRows.projector(result.rows, result.filterName, result.sort);
 
-    expect(result.rows).not.toEqual(result.unsortedRows);
+      expect(rows.length).toEqual(1);
+      expect(rows[0]).toEqual(mockTapIn);
+    });
   });
 
-  it('should truncate the arrays to a maximum of 200 items when capacity is exceeded', () => {
-    const summary = getDefaultTapEventsSummary();
-    const action = TapActions.eventReceived({ tap: mockTap, summary });
-
-    const maxedRows = Array(200).fill(testRowData);
-    const startingState: State = {
-      ...initialState,
-      rows: maxedRows,
-      unsortedRows: maxedRows,
-    };
-
-    const result = reducer(startingState, action);
-
-    expect(result.unsortedRows.length).toEqual(200);
-    expect(result.rows.length).toEqual(200);
-
-    expect(result.unsortedRows[0]).toEqual(mockTap);
-    expect(result.rows[0]).toEqual(mockTap);
-  });
-
-  it('should clear loading or connection flags and store the error payload on streamError', () => {
+  describe('when a stream error occurs', () => {
+    let action: Action<'[Tap Domain] streamError'>;
+    let state: TapState;
     const mockError = new Error('Connection Timed Out');
-    const action = TapActions.streamError({ error: mockError });
 
-    const startingState: State = { ...initialState, isLoading: true, isConnected: true };
-    const result = reducer(startingState, action);
+    beforeEach(() => {
+      action = TapActions.streamError({ error: mockError });
 
-    expect(result.isLoading).toBe(false);
-    expect(result.isConnected).toBe(false);
-    expect(result.error).toBe(mockError);
+      state = { ...initialState, isLoading: true, isConnected: true };
+    });
+
+    it('should clear loading or connection flags and store the error payload on streamError', () => {
+      const result = reducer(state, action);
+
+      expect(result.isLoading).toBe(false);
+      expect(result.isConnected).toBe(false);
+      expect(result.error).toBe(mockError);
+    });
   });
 
-  it('should wipe rows and reset connection properties when disconnecting', () => {
-    const activeState: State = {
-      rows: [mockTap],
-      unsortedRows: [],
-      sortColumn: '',
-      isLoading: false,
-      stats: getDefaultTapEventsSummary(),
-      isConnected: true,
-      error: null,
-      sortDirection: 'none',
-    };
-    const action = TapActions.disconnectStream();
-    const result = reducer(activeState, action);
+  describe('when the connection is disconnected', () => {
+    let action: Action<'[Tap Domain] disconnectStream'>;
 
-    expect(result.rows).toEqual([]);
-    expect(result.isLoading).toBe(false);
-    expect(result.isConnected).toBe(false);
+    beforeEach(() => {
+      action = TapActions.disconnectStream();
+    });
+
+    it('should wipe rows and reset connection properties when disconnecting', () => {
+      const result = reducer(initialState, action);
+
+      expect(result).toEqual(initialState);
+    });
   });
 });

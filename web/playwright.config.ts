@@ -14,6 +14,12 @@ export interface MyCustomOptions extends TestInfo {
   apiURL: string;
 }
 
+if (typeof require !== 'undefined' && require.extensions) {
+  require.extensions['.svg'] = function (module) {
+    module.exports = 'data:image/svg+xml;utf8,<svg></svg>';
+  };
+}
+
 export default defineConfig<MyCustomOptions>({
   testDir: './e2e',
   /* Run tests in files in parallel */
@@ -31,7 +37,10 @@ export default defineConfig<MyCustomOptions>({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env['PLAYWRIGHT_TEST_BASE_URL'] ?? 'http://localhost:4200',
     apiURL: 'http://localhost:5165',
-    actionTimeout: 15_000,
+    // launchOptions: {
+    //   slowMo: 10000, // 1 second delay between actions
+    // },
+    headless: true,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

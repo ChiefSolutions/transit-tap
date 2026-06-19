@@ -1,24 +1,22 @@
-import { createFeature, createReducer, on } from '@ngrx/store';
-import { TapTableRow, TapEventsSummary, SortDirection } from '../models';
+import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
+import { TapTableRow, TapEventsSummary, TapStatName, TableSort } from '../types';
 import { TapActions } from './tap.actions';
-import { getDefaultTapEventsSummary, sortRows } from '../utils';
+import { getDefaultTapEventsSummary, sortTapsResponseData } from '../utils';
 
-export interface State {
+export interface TapState {
+  filterName: TapStatName;
   rows: TapTableRow[];
-  sortColumn: keyof TapTableRow;
-  unsortedRows: TapTableRow[];
-  sortDirection: SortDirection;
+  sort: TableSort;
   stats: TapEventsSummary;
   isLoading: boolean;
   isConnected: boolean;
   error: Error | null;
 }
 
-export const initialState: State = {
+export const initialState: TapState = {
+  filterName: 'Total',
   rows: [],
-  unsortedRows: [],
-  sortColumn: '',
-  sortDirection: 'none',
+  sort: { column: '', direction: 'none' },
   stats: getDefaultTapEventsSummary(),
   isLoading: false,
   isConnected: false,
@@ -29,83 +27,37 @@ export const tapFeature = createFeature({
   name: 'tap',
   reducer: createReducer(
     initialState,
-
     on(TapActions.connectStream, (state) => ({
       ...state,
       isLoading: true,
       isConnected: false,
       error: null,
     })),
+    on(TapActions.eventReceived, (state, { tap, summary }): TapState => {
+      const rows = [tap, ...state.rows];
 
-    on(TapActions.eventReceived, (state, { tap, summary }) => {
-      const nextUnsorted = [tap, ...state.unsortedRows];
-      let nextDisplayRows: TapTableRow[];
-
-      if (nextUnsorted.length > 200) {
-        nextUnsorted.length = 200;
-      }
-
-      if (state.sortDirection === 'none') {
-        nextDisplayRows = nextUnsorted;
-      } else {
-        const activeColumn = state.sortColumn;
-
-        nextDisplayRows = [tap, ...state.rows];
-
-        if (nextDisplayRows.length > 200) {
-          nextDisplayRows.length = 200;
-        }
-
-        nextDisplayRows = sortRows(nextDisplayRows, activeColumn, state.sortDirection);
-      }
-
-      return {
-        ...state,
-        unsortedRows: nextUnsorted,
-        rows: nextDisplayRows,
-        stats: summary,
-        isLoading: false,
-        isConnected: true,
-        error: null,
-      };
+      return { ...state, rows, stats: summary, isLoading: false, isConnected: true };
     }),
-
-    on(TapActions.sort, (state, { column, direction }) => {
-      if (direction === 'none') {
-        return {
-          ...state,
-          sortColumn: '',
-          sortDirection: direction,
-          rows: state.unsortedRows,
-        };
-      }
-
-      const sortedRows = sortRows([...state.unsortedRows], column, direction);
-
-      return {
-        ...state,
-        sortColumn: column,
-        sortDirection: direction,
-        rows: sortedRows,
-      };
-    }),
-
-    on(TapActions.streamError, (state, { error }) => ({
-      ...state,
-      isLoading: false,
-      isConnected: false,
-      error: error,
-    })),
-
-    on(TapActions.disconnectStream, (state) => ({
-      ...state,
-      isLoading: false,
-      isConnected: false,
-      rows: [],
-      unsortedRows: [],
-    })),
+    on(TapActions.sort, (state, sort): TapState => ({ ...state, sort })),
+    on(TapActions.filter, (state, { name }): TapState => ({ ...state, filterName: name })),
+    on(TapActions.streamError, (state, { error }): TapState => ({ ...state, isLoading: false, isConnected: false, error })),
+    on(TapActions.disconnectStream, (state): TapState => ({ ...state, isLoading: false, isConnected: false, rows: [] })),
   ),
+
+  extraSelectors: ({ selectRows, selectFilterName, selectSort }) => ({
+    selectRows: createSelector(selectRows, selectFilterName, selectSort, (rows, filterName, sort) => {
+      const shouldFilter = !!filterName && filterName !== 'Total';
+      const shouldSort = sort && sort.direction !== 'none';
+
+      let processedRows = shouldFilter ? rows.filter((row) => row.event === filterName || row.status === filterName) : [...rows];
+
+      if (shouldSort) {
+        processedRows = sortTapsResponseData(processedRows, sort);
+      }
+
+      return processedRows;
+    }),
+  }),
 });
 
-export const { selectRows, selectStats, selectIsLoading, selectIsConnected, selectError } =
-  tapFeature;
+export const { selectRows, selectStats, selectIsLoading, selectIsConnected, selectError } = tapFeature;

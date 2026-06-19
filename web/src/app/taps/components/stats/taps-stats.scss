@@ -15,19 +15,83 @@
 }
 
 .TapsStats {
-
   &-stat {
+    @include shared.button-reset;
     box-sizing: border-box;
     background-color: var(--colour-background-secondary);
     border: var(--border-size-default) solid var(--colour-cool-grey);
     display: flex;
     flex-direction: column;
     padding: var(--spacing-default);
+    position: relative;
+
+    &:nth-child(2) {
+      background-color: var(--colour-soft-indigo);
+    }
+
+    &:nth-child(3) {
+      background-color: var(--colour-soft-amber);
+    }
+
+    &:nth-child(4) {
+      background-color: var(--colour-cardinal-light);
+    }
+  }
+
+  &-label {
+
   }
 
   &-value {
     color: var(--colour-charcoal-black);
     font-weight: bold;
     font-size: var(--font-size-medium);
+  }
+
+  &-iconLabel {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    margin-bottom: var(--spacing-xxsmall);
+  }
+
+  &-icon {
+    height: 18px;
+    fill: var(--colour-ash-black);
+    margin-right: var(--spacing-xxsmall);
+    width: 18px;
+  }
+
+  &-donut {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  &--in {
+    color: var(--colour-deep-indigo);
+    fill: var(--colour-deep-indigo);
+  }
+
+  &--out {
+    color: var(--colour-deep-amber);
+    fill: var(--colour-deep-amber);
+  }
+
+  &--declined {
+    color: var(--colour-cardinal-red);
+    fill: var(--colour-cardinal-red);
+  }
+
+  ::ng-deep &--chartIn {
+    stroke: var(--colour-deep-indigo);
+  }
+
+  ::ng-deep &--chartOut {
+    stroke: var(--colour-deep-amber);
+  }
+
+  ::ng-deep &--chartDeclined {
+    stroke: var(--colour-cardinal-red);
   }
 }

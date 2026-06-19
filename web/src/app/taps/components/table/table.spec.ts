@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 import { findChildElement, getTapsListTableTestChildren } from 'tests/utils';
 import { mockTapTableRowData } from 'tests/mocks/data';
 import { DebugElement } from '@angular/core';
-import { TableSort } from '../../models';
+import { TableSort } from '../../types';
 
 describe('Table', () => {
   let component: TapsListTable;
@@ -35,8 +35,7 @@ describe('Table', () => {
     });
 
     it('Should render the table in a loading state', () => {
-      const { tableEl, columnEls, deviceNameEl, timestampEl, eventEl, statusEl, noDataLabelEl } =
-        getTapsListTableTestChildren(fixture);
+      const { tableEl, columnEls, deviceNameEl, timestampEl, eventEl, statusEl, noDataLabelEl } = getTapsListTableTestChildren(fixture);
 
       expect(tableEl.nativeElement).toBeTruthy();
       expect(columnEls.length).toEqual(4);
@@ -87,7 +86,7 @@ describe('Table', () => {
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'asc' });
     });
   });
@@ -115,19 +114,19 @@ describe('Table', () => {
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'asc' });
 
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'desc' });
 
       buttonEl.click();
       fixture.detectChanges();
 
-      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName');
+      expect(component.onColumnSort).toHaveBeenCalledWith('deviceName', expect.any(MouseEvent));
       expect(result).toEqual({ column: 'deviceName', direction: 'none' });
     });
   });

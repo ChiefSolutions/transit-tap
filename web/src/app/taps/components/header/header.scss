@@ -10,6 +10,11 @@
     margin-bottom: var(--spacing-default);
   }
 
+  &-icon {
+    height: 24px;
+    width: 24px;
+  }
+
   &-heading {
     font-size: var(--font-size-medium);
     font-weight: var(--font-weight-bold);

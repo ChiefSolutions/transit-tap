@@ -49,7 +49,7 @@ public class TapEventsServiceTests
         Assert.True(firstTap.Timestamp <= DateTime.UtcNow);
 
         // Value Range Validation
-        Assert.Contains(firstTap.Status, new[] { TapStatus.Success, TapStatus.DeniedInsufficientFunds });
+        Assert.Contains(firstTap.Status, new[] { TapStatus.Success, TapStatus.Declined });
         Assert.Contains(firstTap.Event, new[] { TapEvent.TapIn, TapEvent.TapOut });
 
         // Summary Accumulation Validation

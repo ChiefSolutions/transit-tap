@@ -24,7 +24,7 @@ public class TapEventsService() : ITapEventsService
         TapStatus.Success,
         TapStatus.Success,
         TapStatus.Success,
-        TapStatus.DeniedInsufficientFunds
+        TapStatus.Declined
     ];
 
     public async IAsyncEnumerable<TapStreamPayload> GetTapEvents(

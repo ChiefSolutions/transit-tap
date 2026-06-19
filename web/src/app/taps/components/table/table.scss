@@ -42,8 +42,11 @@
 
   &-tableHeaderButton {
     @include shared.button-reset;
-    padding: var(--spacing-default);
+    padding: var(--spacing-small) var(--spacing-default);
     color: var(--colour-charcoal-black);
+    width: 100%;
+    position: relative;
+    z-index: 10;
   }
 
   &-tableHeaderButtonText {

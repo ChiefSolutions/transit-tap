@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TapsStats } from './taps-stats';
 import { By } from '@angular/platform-browser';
 import { getDefaultTapEventsSummary } from '../../utils';
+import { Mock } from 'vitest';
 
 describe('TapsStats', () => {
   let component: TapsStats;
@@ -14,9 +15,13 @@ describe('TapsStats', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(TapsStats);
-    fixture.componentRef.setInput('summary', undefined);
+    fixture.componentRef.setInput('summary', getDefaultTapEventsSummary());
     component = fixture.componentInstance;
     await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   it('should create', () => {
@@ -24,11 +29,6 @@ describe('TapsStats', () => {
   });
 
   describe('when the component is rendered with no data', () => {
-    beforeEach(async () => {
-      fixture.componentRef.setInput('summary', getDefaultTapEventsSummary());
-      fixture.detectChanges();
-    });
-
     it('should should show the stats summary without stat counts', () => {
       const containerEls = fixture.debugElement.queryAll(By.css('.TapsStats-stat'));
       const labelEls = fixture.debugElement.queryAll(By.css('[data-testid="stats-label"]'));
@@ -68,6 +68,28 @@ describe('TapsStats', () => {
       expect(valueEls[1].nativeElement.textContent).toBe('2');
       expect(valueEls[2].nativeElement.textContent).toBe('4');
       expect(valueEls[3].nativeElement.textContent).toBe('2');
+    });
+  });
+
+  describe('when filtering is emitted', () => {
+    let filterSpy: Mock;
+
+    beforeEach(() => {
+      filterSpy = vi.spyOn(component.filterTable, 'emit');
+    });
+
+    it('should emit event for each stat', async () => {
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="stat-button"]'));
+
+      for (const button of buttons) {
+        const buttonElement = button.nativeElement as HTMLButtonElement;
+
+        buttonElement.click();
+        fixture.detectChanges();
+
+        expect(filterSpy).toHaveBeenCalledWith({ event: expect.any(MouseEvent), name: buttonElement.name });
+        filterSpy.mockClear();
+      }
     });
   });
 });

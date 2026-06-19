@@ -1,3 +1,3 @@
 <app-taps-list-header [connected]="isConnected()" />
-<app-taps-stats data-testid="app-taps-stats" [summary]="summarySignal()" />
+<app-taps-stats data-testid="app-taps-stats" [summary]="summarySignal()" (filterTable)="onFilterChange($event)" />
 <app-taps-list-table [data]="rowsSignal()" [isLoading]="isLoading()" (sortColumn)="onSortChange($event)" />

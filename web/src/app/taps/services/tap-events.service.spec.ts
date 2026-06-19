@@ -1,11 +1,13 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TapEventsService } from './tap-events.service';
-import { MockEventSource } from 'tests/mocks/event-source.mock';
-import { TapTableRow } from '../models';
-import { mockTapEventsResponse, mockSummary } from 'tests/mocks/data';
+import { MockEventSource } from 'tests/mocks/unit/event-source.mock';
+import { TapTableRow } from '../types';
+import { mockTapEventsResponse, mockSummary, mockTapTableRowData } from 'tests/mocks/data';
+import { getDefaultTapEventsSummary } from '../utils';
 
 const EventSourceMock = vi.fn(MockEventSource);
+const eventSourceError = new Event('error');
 const testTap = mockTapEventsResponse[0].tap;
 
 describe('TapEventsService', () => {
@@ -28,13 +30,7 @@ describe('TapEventsService', () => {
 
   describe('when getting events', () => {
     const rows: TapTableRow[] = [];
-    let summary = {
-      total: 0,
-      tapIns: 0,
-      tapOuts: 0,
-      declined: 0,
-      errors: 0,
-    };
+    let summary = getDefaultTapEventsSummary();
 
     beforeEach(() => {
       service.getEvents().subscribe((data) => {
@@ -45,6 +41,7 @@ describe('TapEventsService', () => {
 
     it('should transform and emit incoming stream events', () => {
       const instance = EventSourceMock.mock.instances[0];
+      const testRowTap = mockTapTableRowData[0];
 
       instance.onopen();
       instance.onmessage({
@@ -55,14 +52,52 @@ describe('TapEventsService', () => {
       });
 
       expect(rows[0]).toEqual({
-        eventId: testTap.eventId,
-        deviceName: testTap.deviceName,
-        timestamp: testTap.timestamp,
-        event: testTap.event,
-        status: testTap.status,
+        eventId: testRowTap.eventId,
+        deviceName: testRowTap.deviceName,
+        timestamp: testRowTap.timestamp,
+        event: testRowTap.event,
+        status: testRowTap.status,
       });
 
       expect(summary).toEqual(mockSummary);
+    });
+  });
+
+  describe('when no data is sent as part of the response', () => {
+    const rows: TapTableRow[] = [];
+
+    beforeEach(() => {
+      service.getEvents().subscribe((data) => {
+        rows.push(data.tap);
+      });
+    });
+
+    it('should fail and catch the error gracefully', () => {
+      const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
+
+      instance.onopen();
+      instance.onmessage({ data: undefined } as unknown as { data: string });
+
+      expect(rows.length).toEqual(0);
+    });
+  });
+
+  describe('when corrupted json is sent as part of the response', () => {
+    const rows: TapTableRow[] = [];
+
+    beforeEach(() => {
+      service.getEvents().subscribe((data) => {
+        rows.push(data.tap);
+      });
+    });
+
+    it('should fail and catch the error gracefully', () => {
+      const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
+      const corruptJson = `{ deviceName: "Device_01", event: "click", status: "active" }`;
+      instance.onopen();
+      instance.onmessage({ data: corruptJson } as unknown as { data: string });
+
+      expect(rows.length).toEqual(0);
     });
   });
 
@@ -85,13 +120,13 @@ describe('TapEventsService', () => {
     });
   });
 
-  describe('when on error occurs when connection is open', () => {
-    let openError: string | undefined;
+  describe('when an error occurs but the connection is already closed', () => {
+    let closedError: string | undefined;
 
     beforeEach(() => {
       service.getEvents().subscribe({
-        error: (event) => {
-          openError = event.type;
+        error: (event: Error) => {
+          closedError = event.message;
         },
       });
     });
@@ -99,33 +134,11 @@ describe('TapEventsService', () => {
     it('should close the event', async () => {
       const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
-      instance.readyState = 1;
-      instance.onerror(new Event('Open error'));
+      instance.readyState = 2;
+      instance.onerror(eventSourceError);
 
       expect(instance.close).toHaveBeenCalled();
-      expect(openError).toBe('Open error');
-    });
-  });
-
-  describe('when an error occurs but the connection is already closed', () => {
-    let closedError: string | undefined;
-
-    beforeEach(() => {
-      service.getEvents().subscribe({
-        error: (event: Event) => {
-          closedError = event.type;
-        },
-      });
-    });
-
-    it('should not close the event', async () => {
-      const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
-
-      instance.readyState = 2;
-      instance.onerror(new Event('Close error'));
-
-      expect(instance.close).not.toHaveBeenCalled();
-      expect(closedError).toBe(undefined);
+      expect(closedError).toBe('SSE connection permanently closed.');
     });
   });
 
@@ -134,8 +147,8 @@ describe('TapEventsService', () => {
 
     beforeEach(() => {
       service.getEvents().subscribe({
-        error: (error: Event) => {
-          connectingError = error.type;
+        error: (error: Error) => {
+          connectingError = error.message;
         },
       });
     });
@@ -144,10 +157,12 @@ describe('TapEventsService', () => {
       const instance = EventSourceMock.mock.instances[EventSourceMock.mock.instances.length - 1];
 
       instance.readyState = 0;
-      instance.onerror(new Event('Connecting error'));
+      for (let i = 0; i < 5; i++) {
+        instance.onerror(new Event('error'));
+      }
 
       expect(instance.close).to.toHaveBeenCalled();
-      expect(connectingError).toBe('Connecting error');
+      expect(connectingError).toBe('API server is completely offline.');
     });
   });
 });

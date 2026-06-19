@@ -29,11 +29,19 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/",
+                "output": "/assets/"
               }
             ],
             "styles": ["src/global.css", "src/styles.scss"],
             "stylePreprocessorOptions": {
               "includePaths": ["src"]
+            },
+            "loader": {
+              ".svg": "text"
             }
           },
           "configurations": {
