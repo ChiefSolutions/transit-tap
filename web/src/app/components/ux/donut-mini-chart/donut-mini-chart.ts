@@ -1,9 +1,6 @@
 import { Component, computed, input, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { NgClass } from '@angular/common';
-
-const RADIUS = 70;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const GAP = 4;
+import { CIRCUMFERENCE, GAP } from '../../../constants';
 
 @Component({
   selector: 'app-donut-mini-chart',
@@ -15,7 +12,7 @@ const GAP = 4;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     role: 'img',
-    '[attr.aria-label]': '`Statistics summaries for tap events`', // e.g., "Storage usage: 75% used of 100GB"
+    '[attr.aria-label]': '`Statistics summaries for tap events`',
   },
 })
 export class DonutMiniChart {
@@ -36,22 +33,12 @@ export class DonutMiniChart {
   protected ariaLabel = computed(() => `Donut chart: ${this.pctLabel()} tap-in, ${Math.round(this.outPct() * 100)}% tap-out`);
 
   protected inDash = computed(() => {
-    if (this.inPct() < 0.02) {
-      return `0 ${CIRCUMFERENCE}`;
-    }
-
-    const len = this.inPct() * CIRCUMFERENCE;
-    const visible = Math.max(0, len - GAP);
+    const visible = Math.max(0, this.inPct() * CIRCUMFERENCE - GAP);
     return `${visible} ${CIRCUMFERENCE - visible}`;
   });
 
   protected outDash = computed(() => {
-    if (this.outPct() < 0.02) {
-      return `0 ${CIRCUMFERENCE}`;
-    }
-
-    const len = this.outPct() * CIRCUMFERENCE;
-    const visible = Math.max(0, len - GAP);
+    const visible = Math.max(0, this.outPct() * CIRCUMFERENCE - GAP);
     return `${visible} ${CIRCUMFERENCE - visible}`;
   });
 

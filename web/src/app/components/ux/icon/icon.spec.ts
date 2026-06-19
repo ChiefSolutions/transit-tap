@@ -42,7 +42,7 @@ describe('Icon', () => {
       await fixture.whenStable();
     });
 
-    it('should render the icon', () => {
+    it('should not render the svg element', () => {
       const icon = fixture.nativeElement.querySelector('svg');
 
       expect(icon).toBeNull();

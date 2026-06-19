@@ -2,7 +2,7 @@ import { test as base, expect, Page, Locator } from '@playwright/test';
 import path from 'path';
 import { mockServerSideEvents, mockData } from '../utils';
 import { MyCustomOptions } from '../../playwright.config';
-import { sortTapsResponseData } from '../../src/app/taps/utils';
+import { sortTaps } from '../../src/app/taps/utils';
 import { TableSort, TapTableRow } from '../../src/app/taps/types';
 import { TapEventLabelMap } from '../../src/app/constants';
 
@@ -75,7 +75,7 @@ export class DashboardPage {
       return { deviceName, event: TapEventLabelMap[event], eventId, status, timestamp: formattedDate } as TapTableRow;
     });
 
-    return sortTapsResponseData(mapped, sort).map((row) => {
+    return sortTaps(mapped, sort).map((row) => {
       return row[sort.column];
     });
   }

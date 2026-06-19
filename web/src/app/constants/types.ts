@@ -1,4 +1,5 @@
 import { ICONS } from './icons.constant';
+import { TapTableRow } from '../taps/types';
 
 export interface TapEventLabelMapper {
   TapIn: string;
@@ -10,7 +11,7 @@ export interface TapEventLabelMapper {
 }
 
 export interface TapsListTableColumnsNames {
-  name: string;
+  name: keyof TapTableRow;
   text: string;
 }
 
