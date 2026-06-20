@@ -49,7 +49,7 @@ These include: Unit test coverage and lighthouse pageload.
 ### Lighthouse prod:
 <img width="549" height="399" alt="lighthouse-prod" src="https://github.com/user-attachments/assets/a897f1e5-0dfd-44dc-8786-ffe89f1433a9" />
 
-### Lighthouse prod:
+### Lighthouse dev:
 <img width="467" height="397" alt="lighthouse-dev" src="https://github.com/user-attachments/assets/beaef069-f843-4dc0-843e-de517095ae6e" />
 
 
