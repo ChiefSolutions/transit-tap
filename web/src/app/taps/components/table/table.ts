@@ -20,7 +20,7 @@ export class TapsListTable {
 
   public readonly columnSort: WritableSignal<TableSort> = signal<TableSort>({
     direction: 'none',
-    column: '',
+    column: 'deviceName',
   });
 
   public skeletons = tableSkeleton;

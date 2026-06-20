@@ -34,7 +34,6 @@ export interface TapTableRow {
   timestamp: string;
   event: TapEvent;
   status: TapRowEventLabel;
-  [key: string]: string;
 }
 
 export interface TapRowWithStats {

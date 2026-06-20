@@ -37,9 +37,9 @@ public class TapEventsService() : ITapEventsService
 
         const string mockCardToken = "tkn_27rSqew9gZSjJ45xSi1yqKfa";
         const int minDelay = 500;
+        const int maxStream = 500;
         
         var cardStates = new Dictionary<string, TapEvent>();
-        var maxStream = isProd ? 100 : 10_000;
         var maxDelay = isProd ? 5000 : 2000;
         var totalEvents = 0;
         var tapIns = 0;

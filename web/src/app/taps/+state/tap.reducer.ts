@@ -1,7 +1,7 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 import { TapTableRow, TapEventsSummary, TapStatName, TableSort } from '../types';
 import { TapActions } from './tap.actions';
-import { getDefaultTapEventsSummary, sortTapsResponseData } from '../utils';
+import { getDefaultTapEventsSummary, sortTaps } from '../utils';
 
 export interface TapState {
   filterName: TapStatName;
@@ -16,7 +16,7 @@ export interface TapState {
 export const initialState: TapState = {
   filterName: 'Total',
   rows: [],
-  sort: { column: '', direction: 'none' },
+  sort: { column: 'deviceName', direction: 'none' },
   stats: getDefaultTapEventsSummary(),
   isLoading: false,
   isConnected: false,
@@ -52,7 +52,7 @@ export const tapFeature = createFeature({
       let processedRows = shouldFilter ? rows.filter((row) => row.event === filterName || row.status === filterName) : [...rows];
 
       if (shouldSort) {
-        processedRows = sortTapsResponseData(processedRows, sort);
+        processedRows = sortTaps(processedRows, sort);
       }
 
       return processedRows;
